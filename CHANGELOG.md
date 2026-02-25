@@ -53,6 +53,10 @@
 23. GitHub quality gate workflow: `.github/workflows/quality-gates.yml`.
 24. Full-matrix regression comparator: `scripts/check_perf_regression_matrix.py`.
 25. Approved full protocol benchmark baseline artifact: `release_records/artifacts/benchmark_baselines/core_protocol_v1.csv`.
+26. Shared harness runtime module: `scripts/core_harness.py`.
+27. Harness-focused unit tests:
+   1. `tests/test_core_harness.py`
+   2. `tests/test_validate_cuda_cpu_matrix.py`
 
 ### Changed
 1. Documentation for benchmark execution and runner validation in `README.md` and `RUNNER_SETUP.md`.
@@ -68,6 +72,8 @@
 11. `README.md` now includes local lint + coverage commands for harness hardening.
 12. Nightly performance workflow now runs full benchmark protocol matrix and emits trend report artifact using `scripts/check_perf_regression_matrix.py`.
 13. Benchmark protocol upgraded to v1.2 with baseline + trend-comparison contract.
+14. `scripts/benchmark_core_cuda.py` and `scripts/validate_cuda_cpu_matrix.py` now consume a shared harness contract from `scripts/core_harness.py`.
+15. Quality gates now lint and enforce coverage on `scripts.core_harness` and `scripts.validate_cuda_cpu_matrix`.
 
 ## [1.0.0] - 2026-02-24
 ### Added

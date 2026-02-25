@@ -5,191 +5,40 @@ from __future__ import annotations
 
 import argparse
 import ctypes
-import os
-import re
-from collections.abc import Iterable
-from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
-from iir2d_cpu_reference import BORDER_MAP, PRECISION_MAP, TOLERANCE_MAP, iir2d_cpu_reference
 
-CUDA_MEMCPY_HOST_TO_DEVICE = 1
-CUDA_MEMCPY_DEVICE_TO_HOST = 2
-
-
-class IIR2D_Params(ctypes.Structure):
-    _fields_ = [
-        ("width", ctypes.c_int),
-        ("height", ctypes.c_int),
-        ("filter_id", ctypes.c_int),
-        ("border_mode", ctypes.c_int),
-        ("border_const", ctypes.c_float),
-        ("precision", ctypes.c_int),
-    ]
-
-
-@dataclass(frozen=True)
-class Case:
-    width: int
-    height: int
-    filter_id: int
-    border_mode: str
-    precision: str
-
-
-def parse_int_list(value: str) -> list[int]:
-    return [int(v.strip()) for v in value.split(",") if v.strip()]
-
-
-def parse_str_list(value: str) -> list[str]:
-    return [v.strip().lower() for v in value.split(",") if v.strip()]
-
-
-def parse_sizes(value: str) -> list[tuple[int, int]]:
-    out: list[tuple[int, int]] = []
-    for tok in value.split(","):
-        tok = tok.strip().lower()
-        if not tok:
-            continue
-        m = re.fullmatch(r"(\d+)x(\d+)", tok)
-        if not m:
-            raise ValueError(f"Invalid size token {tok!r}; expected WxH like 63x47")
-        out.append((int(m.group(1)), int(m.group(2))))
-    return out
-
-
-def build_cases(
-    sizes: Iterable[tuple[int, int]],
-    filter_ids: Iterable[int],
-    border_modes: Iterable[str],
-    precisions: Iterable[str],
-) -> list[Case]:
-    out: list[Case] = []
-    for width, height in sizes:
-        for filter_id in filter_ids:
-            for border_mode in border_modes:
-                for precision in precisions:
-                    out.append(
-                        Case(
-                            width=width,
-                            height=height,
-                            filter_id=filter_id,
-                            border_mode=border_mode,
-                            precision=precision,
-                        )
-                    )
-    return out
-
-
-def candidate_core_libraries(repo_root: Path) -> list[Path]:
-    pkg = repo_root / "python" / "iir2d_jax"
-    if os.name == "nt":
-        return [
-            pkg / "iir2d_jax.dll",
-            repo_root / "build_win_ninja" / "iir2d_jax.dll",
-            repo_root / "build_win_vs2019" / "Release" / "iir2d_jax.dll",
-            pkg / "libiir2d_jax.so",
-            pkg / "iir2d_jax.so",
-            repo_root / "build_wsl" / "libiir2d_jax.so",
-        ]
-    return [
-        pkg / "libiir2d_jax.so",
-        pkg / "iir2d_jax.so",
-        repo_root / "build_wsl" / "libiir2d_jax.so",
-        pkg / "iir2d_jax.dll",
-        repo_root / "build_win_ninja" / "iir2d_jax.dll",
-        repo_root / "build_win_vs2019" / "Release" / "iir2d_jax.dll",
-    ]
-
-
-def load_core_library(repo_root: Path) -> ctypes.CDLL:
-    errors: list[str] = []
-    for path in candidate_core_libraries(repo_root):
-        if not path.exists():
-            continue
-        try:
-            return ctypes.CDLL(str(path))
-        except OSError as exc:
-            errors.append(f"{path}: {exc}")
-    if errors:
-        joined = "\n".join(errors)
-        raise RuntimeError(f"Could not load iir2d shared library from candidates:\n{joined}")
-    raise FileNotFoundError("Could not locate iir2d shared library in expected paths.")
-
-
-def find_cudart() -> ctypes.CDLL:
-    if os.name == "nt":
-        search_dirs: list[Path] = []
-        cuda_root = Path(r"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA")
-        if cuda_root.exists():
-            versions = sorted(
-                [p for p in cuda_root.iterdir() if p.is_dir() and re.fullmatch(r"v\d+\.\d+", p.name)],
-                key=lambda p: tuple(int(x) for x in p.name[1:].split(".")),
-                reverse=True,
-            )
-            search_dirs.extend([p / "bin" for p in versions])
-        for key, val in os.environ.items():
-            if key.startswith("CUDA_PATH") and val:
-                search_dirs.append(Path(val) / "bin")
-        for seg in os.environ.get("PATH", "").split(os.pathsep):
-            if seg:
-                search_dirs.append(Path(seg))
-        seen: set[str] = set()
-        for d in search_dirs:
-            if not d.exists():
-                continue
-            d_key = str(d).lower()
-            if d_key in seen:
-                continue
-            seen.add(d_key)
-            for dll in sorted(d.glob("cudart64_*.dll"), reverse=True):
-                try:
-                    return ctypes.CDLL(str(dll))
-                except OSError:
-                    continue
-        raise RuntimeError("Failed to load cudart64_*.dll from CUDA/PATH locations.")
-
-    for name in (
-        "libcudart.so",
-        "libcudart.so.13",
-        "libcudart.so.12",
-        "libcudart.so.11.0",
-        "/usr/local/cuda/lib64/libcudart.so",
-    ):
-        try:
-            return ctypes.CDLL(name)
-        except OSError:
-            continue
-    raise RuntimeError("Failed to load libcudart.so")
-
-
-def configure_cudart(cudart: ctypes.CDLL) -> None:
-    cudart.cudaGetErrorString.argtypes = [ctypes.c_int]
-    cudart.cudaGetErrorString.restype = ctypes.c_char_p
-    cudart.cudaMalloc.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.c_size_t]
-    cudart.cudaMalloc.restype = ctypes.c_int
-    cudart.cudaFree.argtypes = [ctypes.c_void_p]
-    cudart.cudaFree.restype = ctypes.c_int
-    cudart.cudaMemcpy.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_int]
-    cudart.cudaMemcpy.restype = ctypes.c_int
-    cudart.cudaDeviceSynchronize.argtypes = []
-    cudart.cudaDeviceSynchronize.restype = ctypes.c_int
-
-
-def configure_core_lib(core_lib: ctypes.CDLL) -> None:
-    core_lib.iir2d_forward_cuda.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(IIR2D_Params)]
-    core_lib.iir2d_forward_cuda.restype = ctypes.c_int
-    core_lib.iir2d_status_string.argtypes = [ctypes.c_int]
-    core_lib.iir2d_status_string.restype = ctypes.c_char_p
-
-
-def cuda_check(cudart: ctypes.CDLL, code: int, context: str) -> None:
-    if code == 0:
-        return
-    err = cudart.cudaGetErrorString(code)
-    msg = err.decode("utf-8") if err else f"CUDA error {code}"
-    raise RuntimeError(f"{context} failed: {msg} ({code})")
+if __package__:
+    from .core_harness import (
+        BORDER_MAP,
+        CUDA_MEMCPY_DEVICE_TO_HOST,
+        CUDA_MEMCPY_HOST_TO_DEVICE,
+        PRECISION_MAP,
+        IIR2D_Params,
+        configure_core_lib,
+        configure_cudart,
+        cuda_check,
+        find_cudart,
+        load_core_library,
+        parse_case_matrix,
+    )
+    from .iir2d_cpu_reference import TOLERANCE_MAP, iir2d_cpu_reference
+else:
+    from core_harness import (
+        BORDER_MAP,
+        CUDA_MEMCPY_DEVICE_TO_HOST,
+        CUDA_MEMCPY_HOST_TO_DEVICE,
+        PRECISION_MAP,
+        IIR2D_Params,
+        configure_core_lib,
+        configure_cudart,
+        cuda_check,
+        find_cudart,
+        load_core_library,
+        parse_case_matrix,
+    )
+    from iir2d_cpu_reference import TOLERANCE_MAP, iir2d_cpu_reference
 
 
 def run_cuda_forward(
@@ -270,21 +119,12 @@ def main() -> int:
     ap.add_argument("--max_failures", type=int, default=8)
     args = ap.parse_args()
 
-    sizes = parse_sizes(args.sizes)
-    filter_ids = parse_int_list(args.filter_ids)
-    border_modes = parse_str_list(args.border_modes)
-    precisions = parse_str_list(args.precisions)
-
-    for fid in filter_ids:
-        if fid < 1 or fid > 8:
-            raise ValueError(f"Invalid filter_id {fid}; expected 1..8")
-    for mode in border_modes:
-        if mode not in BORDER_MAP:
-            raise ValueError(f"Invalid border mode {mode!r}; expected one of {sorted(BORDER_MAP)}")
-    for precision in precisions:
-        if precision not in PRECISION_MAP:
-            raise ValueError(f"Invalid precision {precision!r}; expected one of {sorted(PRECISION_MAP)}")
-
+    cases = parse_case_matrix(
+        sizes_arg=args.sizes,
+        filter_ids_arg=args.filter_ids,
+        border_modes_arg=args.border_modes,
+        precisions_arg=args.precisions,
+    )
     tolerances = {
         "f32": (args.rtol_f32, args.atol_f32),
         "mixed": (args.rtol_mixed, args.atol_mixed),
@@ -292,19 +132,14 @@ def main() -> int:
     }
 
     repo_root = Path(__file__).resolve().parents[1]
-    core_lib = load_core_library(repo_root)
+    core_lib, _ = load_core_library(repo_root)
     cudart = find_cudart()
     configure_core_lib(core_lib)
     configure_cudart(cudart)
 
-    cases = build_cases(sizes, filter_ids, border_modes, precisions)
     failures = 0
-
     for idx, case in enumerate(cases, 1):
-        if case.precision == "f64":
-            dtype = np.float64
-        else:
-            dtype = np.float32
+        dtype = np.float64 if case.precision == "f64" else np.float32
         seed_case = (
             args.seed
             + case.filter_id * 1009

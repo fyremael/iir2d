@@ -87,9 +87,11 @@ CI:
    2. Local run:
 ```bash
 python3 -m pip install -r requirements-dev.txt
-python3 -m ruff check scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py scripts/check_perf_regression_matrix.py tests
+python3 -m ruff check scripts/core_harness.py scripts/benchmark_core_cuda.py scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py scripts/check_perf_regression_matrix.py tests
 python3 -m pytest tests \
+  --cov=scripts.core_harness \
   --cov=scripts.iir2d_cpu_reference \
+  --cov=scripts.validate_cuda_cpu_matrix \
   --cov=scripts.build_benchmark_claims_packet \
   --cov=scripts.check_perf_regression \
   --cov=scripts.check_perf_regression_matrix \

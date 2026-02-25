@@ -21,6 +21,7 @@ Commercialization docs:
 9. `PILOT_TO_PAID_PLAYBOOK.md`
 10. `PACKAGING_LINUX.md`
 11. `PACKAGING_WINDOWS.md`
+12. `PILOT_WAVE1_EXECUTION.md`
 
 ## Build (Linux)
 

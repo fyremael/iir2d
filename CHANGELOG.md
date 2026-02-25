@@ -37,6 +37,12 @@
 17. Canonical CPU reference implementation for filters `1..8` in `scripts/iir2d_cpu_reference.py`.
 18. CUDA-vs-CPU matrix validator in `scripts/validate_cuda_cpu_matrix.py`.
 19. Benchmark claims packet builder in `scripts/build_benchmark_claims_packet.py`.
+20. Wave 1 pilot launch execution kit:
+   1. `PILOT_WAVE1_EXECUTION.md`
+   2. `release_records/pilot_wave1/OUTREACH_TEMPLATES.md`
+   3. `release_records/pilot_wave1/PILOT_BRIEF_A_VISION_PLATFORM.md`
+   4. `release_records/pilot_wave1/PILOT_BRIEF_B_ML_INFRA.md`
+   5. `release_records/pilot_wave1/PILOT_BRIEF_C_REGULATED_IMAGING.md`
 
 ### Changed
 1. Documentation for benchmark execution and runner validation in `README.md` and `RUNNER_SETUP.md`.
@@ -48,6 +54,7 @@
 7. Linux self-hosted CI now enforces CUDA-vs-CPU parity matrix validation in `.github/workflows/cuda-cross-platform.yml`.
 8. Benchmark protocol upgraded to v1.1 with claim packet generation and sign-off workflow in `BENCHMARK_PROTOCOL.md`.
 9. Legal posture finalized to MIT license in `LICENSE`; `NOTICE` now declares project license explicitly.
+10. `GTM-004` moved to in-progress with wave-launch artifacts tracked in `task_board.md`.
 
 ## [1.0.0] - 2026-02-24
 ### Added

@@ -417,6 +417,7 @@
               <button type="button" class="mode" data-mode="orig">Original</button>
               <button type="button" class="mode" data-mode="f4">Filter 4</button>
               <button type="button" class="mode" data-mode="f8">Filter 8</button>
+              <button type="button" class="mode" data-mode="montage">Montage</button>
             </div>
           </div>
           <div class="panel">
@@ -469,6 +470,7 @@
         orig: "assets/0_0_47/0_0_47_orig.webp",
         f4: "assets/0_0_47/0_0_47_f4.webp",
         f8: "assets/0_0_47/0_0_47_f8.webp",
+        montage: "assets/0_0_47/0_0_47_montage.webp",
       },
       {
         name: "Street Scene",
@@ -477,6 +479,7 @@
         orig: "assets/20220414203414_0_0_120/20220414203414_0_0_120_orig.webp",
         f4: "assets/20220414203414_0_0_120/20220414203414_0_0_120_f4.webp",
         f8: "assets/20220414203414_0_0_120/20220414203414_0_0_120_f8.webp",
+        montage: "assets/20220414203414_0_0_120/20220414203414_0_0_120_montage.webp",
       },
       {
         name: "Portrait Profile",
@@ -485,6 +488,7 @@
         orig: "assets/35e66714-0eeb-4530-a303-3f0c9e726037/35e66714-0eeb-4530-a303-3f0c9e726037_orig.webp",
         f4: "assets/35e66714-0eeb-4530-a303-3f0c9e726037/35e66714-0eeb-4530-a303-3f0c9e726037_f4.webp",
         f8: "assets/35e66714-0eeb-4530-a303-3f0c9e726037/35e66714-0eeb-4530-a303-3f0c9e726037_f8.webp",
+        montage: "assets/35e66714-0eeb-4530-a303-3f0c9e726037/35e66714-0eeb-4530-a303-3f0c9e726037_montage.webp",
       }
     ];
 
@@ -509,7 +513,7 @@
     function render() {
       const scene = scenes[sceneIndex];
       imgOrig.src = scene.orig;
-      const filterKey = mode === "f4" ? "f4" : "f8";
+      const filterKey = mode === "f4" ? "f4" : mode === "montage" ? "montage" : "f8";
       imgFilter.src = scene[filterKey];
 
       sceneNote.textContent = scene.note;
@@ -518,6 +522,11 @@
       if (mode === "orig") {
         imgOrig.classList.add("on");
         imgFilter.classList.remove("on");
+        splitLine.classList.remove("on");
+      } else if (mode === "montage") {
+        imgOrig.classList.remove("on");
+        imgFilter.classList.add("on");
+        imgFilter.style.clipPath = "inset(0 0 0 0)";
         splitLine.classList.remove("on");
       } else if (mode === "f4" || mode === "f8") {
         imgOrig.classList.remove("on");

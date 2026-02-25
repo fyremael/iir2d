@@ -89,7 +89,7 @@ CI:
 ```bash
 python3 -m pip install -r requirements-dev.txt
 python3 scripts/check_asset_sizes.py --max_mb 25
-python3 -m ruff check scripts/core_harness.py scripts/benchmark_core_cuda.py scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py scripts/check_perf_regression_matrix.py scripts/check_asset_sizes.py scripts/video_demo_cuda_pipeline.py tests
+python3 -m ruff check scripts/core_harness.py scripts/benchmark_core_cuda.py scripts/benchmark_video_cuda_pipeline.py scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py scripts/check_perf_regression_matrix.py scripts/check_asset_sizes.py scripts/video_demo_cuda_pipeline.py tests
 python3 -m pytest tests \
   --cov=scripts.core_harness \
   --cov=scripts.iir2d_cpu_reference \
@@ -98,6 +98,7 @@ python3 -m pytest tests \
   --cov=scripts.check_perf_regression \
   --cov=scripts.check_perf_regression_matrix \
   --cov=scripts.check_asset_sizes \
+  --cov=scripts.benchmark_video_cuda_pipeline \
   --cov=scripts.video_demo_cuda_pipeline \
   --cov-report=term-missing \
   --cov-fail-under=85
@@ -195,6 +196,27 @@ Notes:
 2. `--temporal_ema_alpha 1.0` disables temporal smoothing.
 3. For smoke runs, set `--max_frames` (for example `--max_frames 120`).
 4. For NVIDIA encoder output, set `--codec h264_nvenc`.
+
+Benchmark decode -> CUDA IIR2D -> encode throughput:
+
+```bash
+python3 scripts/benchmark_video_cuda_pipeline.py \
+  --in_video /path/to/input.mp4 \
+  --out_csv /tmp/iir2d_video_bench.csv \
+  --filter_id 4 \
+  --border_mode mirror \
+  --precision f32 \
+  --mode full \
+  --codec libx264 \
+  --encode_sink null \
+  --warmup_frames 24 \
+  --timed_frames 240
+```
+
+Key outputs in CSV:
+1. Per-frame loop latency (`loop_ms_p50`, `loop_ms_p95`).
+2. Stage means (`decode_ms_mean`, `process_ms_mean`, `encode_ms_mean`).
+3. Throughput (`timed_fps`, `timed_mpix_per_s`).
 
 ## Usage
 

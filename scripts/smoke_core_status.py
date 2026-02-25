@@ -46,6 +46,16 @@ def main() -> int:
     lib = load_lib(candidate_libs(repo_root))
     lib.iir2d_status_string.restype = ctypes.c_char_p
     lib.iir2d_status_string.argtypes = [ctypes.c_int]
+    lib.iir2d_api_version_major.restype = ctypes.c_int
+    lib.iir2d_api_version_major.argtypes = []
+    lib.iir2d_api_version_minor.restype = ctypes.c_int
+    lib.iir2d_api_version_minor.argtypes = []
+    lib.iir2d_api_version_patch.restype = ctypes.c_int
+    lib.iir2d_api_version_patch.argtypes = []
+    lib.iir2d_api_version_packed.restype = ctypes.c_int
+    lib.iir2d_api_version_packed.argtypes = []
+    lib.iir2d_build_fingerprint.restype = ctypes.c_char_p
+    lib.iir2d_build_fingerprint.argtypes = []
 
     errors = []
     for code, expected in EXPECTED.items():
@@ -60,7 +70,25 @@ def main() -> int:
             print(f"  code={code}: expected={expected!r} got={got!r}")
         return 1
 
+    major = lib.iir2d_api_version_major()
+    minor = lib.iir2d_api_version_minor()
+    patch = lib.iir2d_api_version_patch()
+    packed = lib.iir2d_api_version_packed()
+    if (major, minor, patch) != (1, 0, 0):
+        print(f"FAIL: unexpected API version tuple {(major, minor, patch)}")
+        return 1
+    if packed != 10000:
+        print(f"FAIL: unexpected packed API version {packed}")
+        return 1
+    fp_raw = lib.iir2d_build_fingerprint()
+    fp = fp_raw.decode("utf-8") if fp_raw else ""
+    if not fp.strip():
+        print("FAIL: empty build fingerprint")
+        return 1
+
     print("PASS: iir2d_status_string contract")
+    print(f"PASS: api_version={major}.{minor}.{patch} packed={packed}")
+    print(f"PASS: build_fingerprint={fp}")
     print(f"library={getattr(lib, '_name', '<unknown>')}")
     return 0
 

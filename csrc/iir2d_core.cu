@@ -3,6 +3,7 @@
 #include <cuda_runtime.h>
 #include <cub/block/block_scan.cuh>
 #include <cmath>
+#include <cstdio>
 #include <cstring>
 
 #define CUDA_CHECK_RET(call) do { \
@@ -1830,4 +1831,38 @@ const char* iir2d_status_string(int status_code) {
         default:
             return "unknown_status";
     }
+}
+
+int iir2d_api_version_major(void) {
+    return IIR2D_API_VERSION_MAJOR;
+}
+
+int iir2d_api_version_minor(void) {
+    return IIR2D_API_VERSION_MINOR;
+}
+
+int iir2d_api_version_patch(void) {
+    return IIR2D_API_VERSION_PATCH;
+}
+
+int iir2d_api_version_packed(void) {
+    return IIR2D_API_VERSION_MAJOR * 10000 + IIR2D_API_VERSION_MINOR * 100 + IIR2D_API_VERSION_PATCH;
+}
+
+const char* iir2d_build_fingerprint(void) {
+    static char fp[96];
+    static bool initialized = false;
+    if (!initialized) {
+        std::snprintf(
+            fp,
+            sizeof(fp),
+            "iir2d/%d.%d.%d %s %s",
+            IIR2D_API_VERSION_MAJOR,
+            IIR2D_API_VERSION_MINOR,
+            IIR2D_API_VERSION_PATCH,
+            __DATE__,
+            __TIME__);
+        initialized = true;
+    }
+    return fp;
 }

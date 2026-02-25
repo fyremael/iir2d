@@ -14,6 +14,25 @@
 10. RC1 promotion decision recorded in `release_records/RC_2026-02-25_RC1.md`.
 11. Initial legal/security scaffolding: `LICENSE`, `NOTICE`, and `SECURITY.md`.
 12. Annotated usage runbook with intuition pumps in `USAGE_GUIDE.md`.
+13. Commercialization collateral docs:
+   1. `PRODUCT_ONE_PAGER.md`
+   2. `GETTING_STARTED_30MIN.md`
+   3. `API_REFERENCE.md`
+   4. `TROUBLESHOOTING.md`
+   5. `COMPATIBILITY_MATRIX.md`
+   6. `GTM_ICP_RUBRIC.md`
+   7. `DESIGN_PARTNER_PILOT_TEMPLATE.md`
+   8. `PRICING_AND_PACKAGING.md`
+   9. `PILOT_TO_PAID_PLAYBOOK.md`
+   10. `PACKAGING_LINUX.md`
+   11. `PACKAGING_WINDOWS.md`
+14. Security/dependency policy tooling:
+   1. `.github/workflows/dependency-license-scan.yml`
+   2. `scripts/check_license_policy.py`
+   3. `requirements-security.txt`
+15. Nightly performance regression automation:
+   1. `.github/workflows/nightly-perf-regression.yml`
+   2. `scripts/check_perf_regression.py`
 
 ### Changed
 1. Documentation for benchmark execution and runner validation in `README.md` and `RUNNER_SETUP.md`.
@@ -21,6 +40,7 @@
 3. CI workflow includes hosted bootstrap fallback mode gated by repo variable `IIR2D_USE_SELF_HOSTED`.
 4. RC1 CI evidence upgraded from hosted fallback to real self-hosted CUDA runs (`#4`, `#5`) on 2026-02-25 UTC.
 5. RC1 closeout checklist and sign-off tables were finalized with delegated role approvals under Product Lead directive.
+6. Core runtime API now exposes version and build fingerprint query functions, validated in `scripts/smoke_core_status.py`.
 
 ## [1.0.0] - 2026-02-24
 ### Added

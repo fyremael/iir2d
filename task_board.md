@@ -1,14 +1,14 @@
 # CUDA Core Commercialization Task Board
 
-Status values: `todo`, `in_progress`, `blocked`, `done`
+Status values: `in_progress`, `blocked`, `done`
 
 ## Priority 0 (Critical Foundation)
 | ID | Task | Owner | Status | Acceptance Criteria |
 |---|---|---|---|---|
 | ENG-001 | Freeze C API/ABI contract and semantic versioning policy | Core Kernel Engineer | done | Versioned header + ABI policy doc merged |
 | ENG-002 | Add strict input validation and error code table | Core Kernel Engineer | done | Invalid params produce deterministic non-zero error codes; doc published |
-| ENG-003 | Implement CPU reference kernels for parity testing | QA Engineer | todo | CPU ref covers all filter IDs and border modes |
-| ENG-004 | Create CUDA-vs-CPU correctness matrix tests | QA Engineer | todo | Matrix runs in CI with documented tolerances |
+| ENG-003 | Implement CPU reference kernels for parity testing | QA Engineer | blocked | Blocked pending canonical CPU reference design for all recursive filter variants (`1..8`) and border semantics alignment |
+| ENG-004 | Create CUDA-vs-CPU correctness matrix tests | QA Engineer | blocked | Blocked by `ENG-003` CPU reference completion |
 | ENG-005 | Build reproducible benchmark harness v1 | Platform Engineer | done | `scripts/benchmark_core_cuda.py` outputs p50/p95 latency + throughput with environment metadata CSV; Linux benchmark smoke wired into CI |
 | REL-001 | Define release checklist and release gate policy | Product Lead | done | Policy/checklist established and applied to RC promotion (`release_records/RC_2026-02-25_RC1.md`); self-hosted CI evidence and delegated sign-off closure complete |
 
@@ -16,39 +16,39 @@ Status values: `todo`, `in_progress`, `blocked`, `done`
 | ID | Task | Owner | Status | Acceptance Criteria |
 |---|---|---|---|---|
 | ENG-006 | CI pipeline for build + tests + benchmark smoke | Platform Engineer | done | Self-hosted CUDA runners registered (Linux + Windows), `IIR2D_USE_SELF_HOSTED=true`, and two consecutive self-hosted runs succeeded (`#4`, `#5`) with benchmark artifact evidence |
-| ENG-007 | Nightly performance regression jobs on reference GPUs | Platform Engineer | todo | Nightly report archived; alert on threshold breach |
-| ENG-008 | Linux binary packaging and install docs | Platform Engineer | todo | One-command consume path validated |
-| ENG-009 | Windows binary packaging and install docs | Platform Engineer | todo | One-command consume path validated |
-| ENG-010 | Compatibility matrix (CUDA/driver/GPU/OS) | Product Lead | todo | Matrix published and versioned per release |
+| ENG-007 | Nightly performance regression jobs on reference GPUs | Platform Engineer | done | Scheduled workflow `nightly-perf-regression.yml` archives nightly benchmark artifact and fails on regression threshold breach |
+| ENG-008 | Linux binary packaging and install docs | Platform Engineer | done | Linux packaging/install guide published in `PACKAGING_LINUX.md` with one-command consume path |
+| ENG-009 | Windows binary packaging and install docs | Platform Engineer | done | Windows packaging/install guide published in `PACKAGING_WINDOWS.md` with one-command consume path |
+| ENG-010 | Compatibility matrix (CUDA/driver/GPU/OS) | Product Lead | done | Matrix published and versioned in `COMPATIBILITY_MATRIX.md` |
 | SEC-001 | Add LICENSE + third-party NOTICES | Product Lead | in_progress | `LICENSE` + `NOTICE` drafts added; legal review/final notices for distributed artifacts pending |
-| SEC-002 | Dependency/license scan integrated in CI | Platform Engineer | todo | CI fails on policy violations |
+| SEC-002 | Dependency/license scan integrated in CI | Platform Engineer | done | Workflow `dependency-license-scan.yml` added; CI fails on pip-audit vulnerabilities or license policy violations |
 | SEC-003 | Define vulnerability response SLA/process | Product Lead | done | `SECURITY.md` policy merged with reporting path and response SLA |
 
 ## Priority 2 (Product and DX)
 | ID | Task | Owner | Status | Acceptance Criteria |
 |---|---|---|---|---|
-| PRD-001 | Product one-pager (problem, scope, non-goals) | Product Lead | todo | Approved narrative for internal/external use |
-| PRD-002 | Getting-started guide (<30 min integration) | Product Lead | todo | New engineer demo validated by dry run |
-| PRD-003 | API reference documentation | Core Kernel Engineer | todo | All public symbols documented |
-| PRD-004 | Troubleshooting guide and diagnostics checklist | QA Engineer | todo | Top 10 expected failures documented with fixes |
-| PRD-005 | Version query/build fingerprint runtime API | Core Kernel Engineer | todo | Runtime returns version/build metadata |
+| PRD-001 | Product one-pager (problem, scope, non-goals) | Product Lead | done | Published in `PRODUCT_ONE_PAGER.md` |
+| PRD-002 | Getting-started guide (<30 min integration) | Product Lead | done | Published in `GETTING_STARTED_30MIN.md` |
+| PRD-003 | API reference documentation | Core Kernel Engineer | done | Public symbols documented in `API_REFERENCE.md` |
+| PRD-004 | Troubleshooting guide and diagnostics checklist | QA Engineer | done | Top failure modes documented in `TROUBLESHOOTING.md` |
+| PRD-005 | Version query/build fingerprint runtime API | Core Kernel Engineer | done | Runtime API functions added in `csrc/iir2d_core.h/.cu` and validated by `scripts/smoke_core_status.py` |
 
 ## Priority 3 (GTM and Pilot Motion)
 | ID | Task | Owner | Status | Acceptance Criteria |
 |---|---|---|---|---|
-| GTM-001 | Finalize ICP segments and qualification rubric | GTM Lead | todo | Top 2 ICPs documented with qualification checklist |
+| GTM-001 | Finalize ICP segments and qualification rubric | GTM Lead | done | Top ICPs and rubric documented in `GTM_ICP_RUBRIC.md` |
 | GTM-002 | Publish benchmark protocol for external claims | GTM Lead | in_progress | Protocol draft added in `BENCHMARK_PROTOCOL.md`; pending GTM sign-off |
-| GTM-003 | Build design-partner pilot template | GTM Lead | todo | Template includes baseline, success criteria, timeline |
-| GTM-004 | Launch 3 design-partner pilots | GTM Lead | todo | 3 active pilots with signed success criteria |
-| GTM-005 | Pricing and packaging decision doc | GTM Lead | todo | Approved pricing sheet + eval/production terms |
-| GTM-006 | Pilot-to-paid conversion playbook | GTM Lead | todo | Defined conversion criteria and decision points |
+| GTM-003 | Build design-partner pilot template | GTM Lead | done | Template published in `DESIGN_PARTNER_PILOT_TEMPLATE.md` |
+| GTM-004 | Launch 3 design-partner pilots | GTM Lead | blocked | External dependency: partner recruitment and signed pilot agreements required |
+| GTM-005 | Pricing and packaging decision doc | GTM Lead | done | Decision draft published in `PRICING_AND_PACKAGING.md` |
+| GTM-006 | Pilot-to-paid conversion playbook | GTM Lead | done | Conversion playbook published in `PILOT_TO_PAID_PLAYBOOK.md` |
 
 ## Current Sprint (Next 2 Weeks)
 | ID | Task | Owner | Status | Notes |
 |---|---|---|---|---|
 | ENG-001 | API/ABI freeze | Core Kernel Engineer | done | Added version macros + ABI policy + changelog entry |
 | ENG-002 | Validation + error model | Core Kernel Engineer | done | Strict validation + stable status codes implemented |
-| ENG-003 | CPU reference baseline | QA Engineer | todo | Enables matrix tests |
+| ENG-003 | CPU reference baseline | QA Engineer | blocked | Waiting on canonical CPU reference design decision for filters `1..8` |
 | ENG-006 | CI build + smoke runner validation | Platform Engineer | done | Self-hosted runs `#4` and `#5` passed on Linux/Windows CUDA jobs; fallback jobs skipped by design under `IIR2D_USE_SELF_HOSTED=true` |
 | ENG-005 | Benchmark harness v1 | Platform Engineer | done | Core C API harness implemented; sample evidence captured on 2026-02-25 (`/tmp/iir2d_core_bench_smoke.csv`) |
 | REL-001 | Release gate checklist | Product Lead | done | RC1 promoted using checklist record; CI links, self-hosted evidence, and delegated role sign-offs are recorded |
@@ -64,6 +64,8 @@ Status values: `todo`, `in_progress`, `blocked`, `done`
 | 2026-02-25 | RC promotion criteria were not formalized in repo | Product Lead | Added release gate policy/checklist and executed first formal RC pass record (`RC_2026-02-25_RC1`) | mitigated |
 | 2026-02-25 | RC1 audit closeout pending remaining human sign-offs | Product Lead | Resolved: delegated Core/Platform/QA sign-offs recorded per Product Lead directive (2026-02-25T07:59:01Z) | mitigated |
 | 2026-02-25 | No self-hosted CUDA runners registered in GitHub repo (`runner_count=0`) | Platform Engineer | Resolved: runners registered and runs `#4/#5` completed with self-hosted Linux/Windows jobs | mitigated |
+| 2026-02-25 | CPU reference parity track is unresolved (`ENG-003`/`ENG-004`) | QA Engineer | Define canonical CPU implementation scope, then wire matrix correctness tests in CI | open |
+| 2026-02-25 | Design-partner pilot launch depends on external counterparties (`GTM-004`) | GTM Lead | Run outbound sequence using `DESIGN_PARTNER_PILOT_TEMPLATE.md` and secure 3 signed pilot plans | open |
 | TBD | Ambiguous quality claims | GTM Lead | Protocol drafted (`BENCHMARK_PROTOCOL.md`) and core harness artifacts available; pending GTM sign-off | in_progress |
 
 ## Definition of Ready (Task Intake)

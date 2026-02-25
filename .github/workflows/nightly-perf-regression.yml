@@ -1,0 +1,45 @@
+name: nightly-perf-regression
+
+on:
+  schedule:
+    - cron: "20 7 * * *"
+  workflow_dispatch:
+
+jobs:
+  nightly_linux_perf:
+    runs-on: [self-hosted, linux, x64, gpu, cuda]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and smoke (Linux)
+        shell: bash
+        run: |
+          bash scripts/build_and_smoke_wsl.sh
+
+      - name: Run nightly benchmark sample
+        shell: bash
+        run: |
+          python3 scripts/benchmark_core_cuda.py \
+            --sizes 512x512 \
+            --filter_ids 1 \
+            --border_modes mirror \
+            --precisions f32 \
+            --warmup 5 \
+            --iters 20 \
+            --out_csv /tmp/iir2d_core_bench_nightly.csv
+
+      - name: Check regression vs RC baseline
+        shell: bash
+        run: |
+          python3 scripts/check_perf_regression.py \
+            --current_csv /tmp/iir2d_core_bench_nightly.csv \
+            --baseline_csv release_records/artifacts/RC_2026-02-25_RC1/pass2_linux_core_benchmark_smoke.csv \
+            --metric latency_ms_p50 \
+            --max_regression_pct 25.0
+
+      - name: Upload nightly benchmark artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-linux-core-benchmark
+          path: /tmp/iir2d_core_bench_nightly.csv

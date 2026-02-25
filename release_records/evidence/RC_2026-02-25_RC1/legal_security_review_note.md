@@ -1,12 +1,16 @@
 # RC1 Legal/Security Review Note
 
 Date (UTC): 2026-02-25
-Reviewer: Codex session (pre-sign-off review)
+Reviewer: Codex session (pre-sign-off review; refreshed during closeout)
 
 ## Current State
-1. `SEC-001` (LICENSE/NOTICES) is still `todo`.
-2. `SEC-002` (dependency/license scan in CI) is still `todo`.
-3. `SEC-003` (vulnerability response process) is still `todo`.
+1. `SEC-001` (LICENSE/NOTICES) is `in_progress`:
+   1. Draft `LICENSE` and `NOTICE` files are in repo.
+   2. Final legal wording/sign-off remains open before external distribution.
+2. `SEC-002` (dependency/license scan in CI) is `done`:
+   1. Workflow `.github/workflows/dependency-license-scan.yml` enforces vulnerability and license policy checks.
+3. `SEC-003` (vulnerability response process) is `done`:
+   1. Public policy file `SECURITY.md` is present.
 
 ## RC Recommendation
 1. Treat legal/security items as controlled RC waivers, not GA-complete.

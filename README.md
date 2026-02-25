@@ -9,6 +9,19 @@ The CUDA core uses a simple, per-row recursive implementation (correctness-first
 Usage guide:
 1. `USAGE_GUIDE.md` (annotated operational runbook with intuition pumps)
 
+Commercialization docs:
+1. `PRODUCT_ONE_PAGER.md`
+2. `GETTING_STARTED_30MIN.md`
+3. `API_REFERENCE.md`
+4. `TROUBLESHOOTING.md`
+5. `COMPATIBILITY_MATRIX.md`
+6. `GTM_ICP_RUBRIC.md`
+7. `DESIGN_PARTNER_PILOT_TEMPLATE.md`
+8. `PRICING_AND_PACKAGING.md`
+9. `PILOT_TO_PAID_PLAYBOOK.md`
+10. `PACKAGING_LINUX.md`
+11. `PACKAGING_WINDOWS.md`
+
 ## Build (Linux)
 
 ### PyTorch

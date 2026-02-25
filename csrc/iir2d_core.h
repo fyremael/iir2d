@@ -65,6 +65,15 @@ IIR2D_EXPORT int iir2d_forward_cuda_stream(const void* in, void* out, const IIR2
 // Returns a static string for an IIR2D_Status code.
 IIR2D_EXPORT const char* iir2d_status_string(int status_code);
 
+// Runtime API version queries.
+IIR2D_EXPORT int iir2d_api_version_major(void);
+IIR2D_EXPORT int iir2d_api_version_minor(void);
+IIR2D_EXPORT int iir2d_api_version_patch(void);
+IIR2D_EXPORT int iir2d_api_version_packed(void); // MAJOR*10000 + MINOR*100 + PATCH
+
+// Build fingerprint for diagnostics and release traceability.
+IIR2D_EXPORT const char* iir2d_build_fingerprint(void);
+
 // JAX custom call entrypoint (CUDA backend)
 IIR2D_EXPORT void iir2d_custom_call(void* stream, void** buffers, const char* opaque, std::size_t opaque_len);
 

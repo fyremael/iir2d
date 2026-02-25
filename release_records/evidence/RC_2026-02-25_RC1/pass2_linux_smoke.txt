@@ -1,0 +1,10 @@
+-- Configuring done (0.1s)
+-- Generating done (0.1s)
+-- Build files have been written to: /mnt/d/_codex/iir2d_op/build_wsl
+ninja: no work to do.
+PASS: iir2d_status_string contract
+library=/mnt/d/_codex/iir2d_op/python/iir2d_jax/libiir2d_jax.so
+jax 0.4.38
+jaxlib 0.4.38
+devices [CudaDevice(id=0)]
+y stats 0.0014227419160306454 0.0018404219299554825 0.0017845225520431995

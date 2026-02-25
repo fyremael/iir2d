@@ -1,0 +1,2 @@
+[1/1] 512x512 f1 mirror/f32: p50=0.270 ms p95=0.302 ms tput=969.2 MPix/s
+Wrote benchmark CSV: /mnt/d/_codex/iir2d_op/release_records/artifacts/RC_2026-02-25_RC1/pass2_linux_core_benchmark_smoke.csv

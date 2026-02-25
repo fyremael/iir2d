@@ -1,0 +1,38 @@
+Tue Feb 24 22:14:09 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 591.44                 Driver Version: 591.44         CUDA Version: 13.1     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                  Driver-Model | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 2080      WDDM  |   00000000:01:00.0  On |                  N/A |
+| 18%   46C    P8             20W /  215W |    2019MiB /   8192MiB |     18%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A            1708    C+G   ...1g1gvanyjgm\WhatsApp.Root.exe      N/A      |
+|    0   N/A  N/A            6764    C+G   C:\Windows\explorer.exe               N/A      |
+|    0   N/A  N/A            7868    C+G   ...AcrobatNotificationClient.exe      N/A      |
+|    0   N/A  N/A           11296    C+G   ...indows\System32\ShellHost.exe      N/A      |
+|    0   N/A  N/A           11440    C+G   ...\Creative Cloud UI Helper.exe      N/A      |
+|    0   N/A  N/A           11692    C+G   ...2txyewy\CrossDeviceResume.exe      N/A      |
+|    0   N/A  N/A           13440    C+G   ...y\StartMenuExperienceHost.exe      N/A      |
+|    0   N/A  N/A           13552    C+G   ..._cw5n1h2txyewy\SearchHost.exe      N/A      |
+|    0   N/A  N/A           17000    C+G   ...ool\mathpix-snipping-tool.exe      N/A      |
+|    0   N/A  N/A           17192    C+G   ...Chrome\Application\chrome.exe      N/A      |
+|    0   N/A  N/A           17780    C+G   ...8bbwe\PhoneExperienceHost.exe      N/A      |
+|    0   N/A  N/A           17796    C+G   ...yb3d8bbwe\Notepad\Notepad.exe      N/A      |
+|    0   N/A  N/A           18344    C+G   ...5n1h2txyewy\TextInputHost.exe      N/A      |
+|    0   N/A  N/A           22928    C+G   ...crosoft\OneDrive\OneDrive.exe      N/A      |
+|    0   N/A  N/A           25296    C+G   ...yb3d8bbwe\WindowsTerminal.exe      N/A      |
+|    0   N/A  N/A           27972    C+G   ...xyewy\ShellExperienceHost.exe      N/A      |
+|    0   N/A  N/A           30428    C+G   ...8wekyb3d8bbwe\M365Copilot.exe      N/A      |
+|    0   N/A  N/A           31684    C+G   ...lare WARP\Cloudflare WARP.exe      N/A      |
+|    0   N/A  N/A           32336    C+G   ...ntrolPanel\SystemSettings.exe      N/A      |
++-----------------------------------------------------------------------------------------+

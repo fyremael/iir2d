@@ -1,0 +1,60 @@
+name: cuda-cross-platform
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+    paths:
+      - "csrc/**"
+      - "scripts/**"
+      - "python/iir2d_jax/**"
+      - "CMakeLists.txt"
+      - ".github/workflows/cuda-cross-platform.yml"
+  pull_request:
+    paths:
+      - "csrc/**"
+      - "scripts/**"
+      - "python/iir2d_jax/**"
+      - "CMakeLists.txt"
+      - ".github/workflows/cuda-cross-platform.yml"
+
+jobs:
+  linux_cuda_build_smoke:
+    runs-on: [self-hosted, linux, x64, gpu, cuda]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and smoke (Linux)
+        shell: bash
+        run: |
+          bash scripts/build_and_smoke_wsl.sh
+
+      - name: Core benchmark smoke (Linux)
+        shell: bash
+        run: |
+          python3 scripts/benchmark_core_cuda.py \
+            --sizes 512x512 \
+            --filter_ids 1 \
+            --border_modes mirror \
+            --precisions f32 \
+            --warmup 3 \
+            --iters 8 \
+            --out_csv /tmp/iir2d_core_bench_smoke.csv
+
+      - name: Upload benchmark artifact (Linux)
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-core-benchmark-smoke
+          path: /tmp/iir2d_core_bench_smoke.csv
+
+  windows_cuda_build_smoke:
+    runs-on: [self-hosted, windows, x64, gpu, cuda]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and smoke (Windows, status-only)
+        shell: pwsh
+        run: |
+          powershell -ExecutionPolicy Bypass -File .\scripts\build_and_smoke_windows.ps1 -SkipGpuSmoke

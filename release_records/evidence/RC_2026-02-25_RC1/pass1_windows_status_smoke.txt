@@ -1,0 +1,78 @@
+**********************************************************************
+** Visual Studio 2019 Developer Command Prompt v16.11.53
+** Copyright (c) 2021 Microsoft Corporation
+**********************************************************************
+-- The C compiler identification is MSVC 19.29.30159.0
+-- The CXX compiler identification is MSVC 19.29.30159.0
+-- The CUDA compiler identification is NVIDIA 13.1.115
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting CUDA compiler ABI info
+-- Detecting CUDA compiler ABI info - done
+-- Check for working CUDA compiler: C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.1/bin/nvcc.exe - skipped
+-- Detecting CUDA compile features
+-- Detecting CUDA compile features - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: D:/_codex/iir2d_op/build_win_ninja
+**********************************************************************
+** Visual Studio 2019 Developer Command Prompt v16.11.53
+** Copyright (c) 2021 Microsoft Corporation
+**********************************************************************
+[1/3] Building CUDA object CMakeFiles\iir2d_jax.dir\csrc\iir2d_core.cu.obj
+MSVC/cl.exe with traditional preprocessor is used. This may lead to unexpected compilation errors. Please switch to the standard conforming preprocessor by passing `/Zc:preprocessor` to cl.exe. You can define CCCL_IGNORE_MSVC_TRADITIONAL_PREPROCESSOR_WARNING to suppress this warning.
+D:\_codex\iir2d_op\csrc\iir2d_core.cu(1264): warning #177-D: variable "b2" was declared but never referenced
+      float b2 = 0.0f, a2 = 0.0f;
+            ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+D:\_codex\iir2d_op\csrc\iir2d_core.cu(1264): warning #177-D: variable "a2" was declared but never referenced
+      float b2 = 0.0f, a2 = 0.0f;
+                       ^
+
+D:\_codex\iir2d_op\csrc\iir2d_core.cu(1633): warning #177-D: variable "scratch_f" was declared but never referenced
+              float* scratch_f = (float*)ptr; ptr += align_up(n * sizeof(float), 256);
+                     ^
+
+D:\_codex\iir2d_op\csrc\iir2d_core.cu(1713): warning #177-D: variable "off" was declared but never referenced
+          size_t off = 0;
+                 ^
+
+D:\_codex\iir2d_op\csrc\iir2d_core.cu(707): warning #550-D: variable "y0" was set but never used
+          float y0 = out.a00 * s.x + out.a01 * s.y + out.a02 * s.z + out.a03 * s.w + out.b0;
+                ^
+          detected during instantiation of "void biquad_block_fixup4<BLOCK>(const float *, float *, int, int, float, float, float, float, float, const float4 *) [with BLOCK=256]" at line 1191
+
+D:\_codex\iir2d_op\csrc\iir2d_core.cu(708): warning #550-D: variable "y1" was set but never used
+          float y1 = out.a10 * s.x + out.a11 * s.y + out.a12 * s.z + out.a13 * s.w + out.b1;
+                ^
+          detected during instantiation of "void biquad_block_fixup4<BLOCK>(const float *, float *, int, int, float, float, float, float, float, const float4 *) [with BLOCK=256]" at line 1191
+
+iir2d_core.cu
+tmpxft_0000439c_00000000-7_iir2d_core.cudafe1.cpp
+[2/3] Linking CUDA shared library CMakeFiles\iir2d_jax.dir\cmake_device_link.obj
+iir2d_core.cu.obj
+cudadevrt.lib
+cudart.lib
+kernel32.lib
+user32.lib
+gdi32.lib
+winspool.lib
+shell32.lib
+ole32.lib
+oleaut32.lib
+uuid.lib
+comdlg32.lib
+advapi32.lib
+[3/3] Linking CUDA shared library iir2d_jax.dll
+PASS: iir2d_status_string contract
+library=D:\_codex\iir2d_op\python\iir2d_jax\iir2d_jax.dll

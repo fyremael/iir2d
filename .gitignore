@@ -1,0 +1,25 @@
+# Build outputs
+build/
+build_*/
+cmake-build-*/
+
+# Python cache/env
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Local binaries and logs
+*.exe
+*.dll
+*.so
+*.obj
+*.lib
+*.exp
+*.pdb
+*.log
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

@@ -10,12 +10,12 @@ Status values: `todo`, `in_progress`, `blocked`, `done`
 | ENG-003 | Implement CPU reference kernels for parity testing | QA Engineer | todo | CPU ref covers all filter IDs and border modes |
 | ENG-004 | Create CUDA-vs-CPU correctness matrix tests | QA Engineer | todo | Matrix runs in CI with documented tolerances |
 | ENG-005 | Build reproducible benchmark harness v1 | Platform Engineer | done | `scripts/benchmark_core_cuda.py` outputs p50/p95 latency + throughput with environment metadata CSV; Linux benchmark smoke wired into CI |
-| REL-001 | Define release checklist and release gate policy | Product Lead | done | Policy/checklist established and applied to RC promotion (`release_records/RC_2026-02-25_RC1.md`); CI link backfill complete, remaining signatures + self-hosted evidence hardening tracked |
+| REL-001 | Define release checklist and release gate policy | Product Lead | done | Policy/checklist established and applied to RC promotion (`release_records/RC_2026-02-25_RC1.md`); self-hosted CI evidence closure complete; remaining signatures tracked |
 
 ## Priority 1 (Production Readiness)
 | ID | Task | Owner | Status | Acceptance Criteria |
 |---|---|---|---|---|
-| ENG-006 | CI pipeline for build + tests + benchmark smoke | Platform Engineer | in_progress | GitHub Actions run evidence exists (runs `#2`, `#3`) via hosted fallback mode; self-hosted CUDA runner registration + `IIR2D_USE_SELF_HOSTED=true` required for full gate completion |
+| ENG-006 | CI pipeline for build + tests + benchmark smoke | Platform Engineer | done | Self-hosted CUDA runners registered (Linux + Windows), `IIR2D_USE_SELF_HOSTED=true`, and two consecutive self-hosted runs succeeded (`#4`, `#5`) with benchmark artifact evidence |
 | ENG-007 | Nightly performance regression jobs on reference GPUs | Platform Engineer | todo | Nightly report archived; alert on threshold breach |
 | ENG-008 | Linux binary packaging and install docs | Platform Engineer | todo | One-command consume path validated |
 | ENG-009 | Windows binary packaging and install docs | Platform Engineer | todo | One-command consume path validated |
@@ -49,9 +49,9 @@ Status values: `todo`, `in_progress`, `blocked`, `done`
 | ENG-001 | API/ABI freeze | Core Kernel Engineer | done | Added version macros + ABI policy + changelog entry |
 | ENG-002 | Validation + error model | Core Kernel Engineer | done | Strict validation + stable status codes implemented |
 | ENG-003 | CPU reference baseline | QA Engineer | todo | Enables matrix tests |
-| ENG-006 | CI build + smoke runner validation | Platform Engineer | in_progress | CI runs `#2` and `#3` are green via hosted fallback; self-hosted GPU runners and repo variable enablement are pending for full CUDA job execution |
+| ENG-006 | CI build + smoke runner validation | Platform Engineer | done | Self-hosted runs `#4` and `#5` passed on Linux/Windows CUDA jobs; fallback jobs skipped by design under `IIR2D_USE_SELF_HOSTED=true` |
 | ENG-005 | Benchmark harness v1 | Platform Engineer | done | Core C API harness implemented; sample evidence captured on 2026-02-25 (`/tmp/iir2d_core_bench_smoke.csv`) |
-| REL-001 | Release gate checklist | Product Lead | done | RC1 promoted using checklist record; CI links backfilled; remaining audit items are role signatures and self-hosted CUDA evidence hardening |
+| REL-001 | Release gate checklist | Product Lead | done | RC1 promoted using checklist record; CI links and self-hosted evidence backfilled; remaining audit item is role signatures |
 
 ## Risks and Blockers Log
 | Date | Risk | Owner | Mitigation | Status |
@@ -63,7 +63,7 @@ Status values: `todo`, `in_progress`, `blocked`, `done`
 | 2026-02-25 | Baseline commercialization metrics were not reproducibly generated from core API | Platform Engineer | Added `scripts/benchmark_core_cuda.py` harness and CI Linux benchmark smoke artifact upload | mitigated |
 | 2026-02-25 | RC promotion criteria were not formalized in repo | Product Lead | Added release gate policy/checklist and executed first formal RC pass record (`RC_2026-02-25_RC1`) | mitigated |
 | 2026-02-25 | RC1 audit closeout pending remaining human sign-offs | Product Lead | CI links/artifacts are now backfilled; collect Core/Platform/QA signatures for completeness | in_progress |
-| 2026-02-25 | No self-hosted CUDA runners registered in GitHub repo (`runner_count=0`) | Platform Engineer | Register Linux/Windows runners, set `IIR2D_USE_SELF_HOSTED=true`, then re-run two consecutive CI passes with active self-hosted jobs | open |
+| 2026-02-25 | No self-hosted CUDA runners registered in GitHub repo (`runner_count=0`) | Platform Engineer | Resolved: runners registered and runs `#4/#5` completed with self-hosted Linux/Windows jobs | mitigated |
 | TBD | Ambiguous quality claims | GTM Lead | Protocol drafted (`BENCHMARK_PROTOCOL.md`) and core harness artifacts available; pending GTM sign-off | in_progress |
 
 ## Definition of Ready (Task Intake)

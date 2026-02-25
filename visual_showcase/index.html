@@ -250,21 +250,6 @@
       box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.35);
     }
 
-    .tag {
-      position: absolute;
-      top: 0.6rem;
-      padding: 0.35rem 0.55rem;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      font: 700 0.69rem "Space Mono", Consolas, monospace;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-      background: rgba(2, 12, 20, 0.74);
-    }
-
-    .tag.left { left: 0.6rem; color: var(--ink-2); }
-    .tag.right { right: 0.6rem; color: var(--accent-cyan); }
-
     .charts {
       padding: 1rem;
       display: grid;
@@ -391,8 +376,6 @@
           <img id="baseImage" alt="Original image">
           <img id="overlayImage" class="overlay" alt="Filtered image">
           <div id="splitLine" class="split-line"></div>
-          <div class="tag left">original</div>
-          <div class="tag right" id="overlayTag">filter 8</div>
         </div>
       </div>
     </section>
@@ -446,7 +429,6 @@
     const baseImage = document.getElementById("baseImage");
     const overlayImage = document.getElementById("overlayImage");
     const splitLine = document.getElementById("splitLine");
-    const overlayTag = document.getElementById("overlayTag");
 
     sampleData.forEach((item, idx) => {
       const option = document.createElement("option");
@@ -463,7 +445,6 @@
       overlayImage.src = sample[filter];
       overlayImage.style.clipPath = `inset(0 ${100 - splitValue}% 0 0)`;
       splitLine.style.left = `${splitValue}%`;
-      overlayTag.textContent = filter === "f4" ? "filter 4" : "filter 8";
     }
 
     sampleSelect.addEventListener("change", render);

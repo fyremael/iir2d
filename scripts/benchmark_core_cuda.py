@@ -79,14 +79,24 @@ def parse_sizes(value: str) -> list[tuple[int, int]]:
 
 def find_core_library(repo_root: Path) -> Path:
     pkg = repo_root / "python" / "iir2d_jax"
-    candidates = [
-        pkg / "libiir2d_jax.so",
-        pkg / "iir2d_jax.so",
-        pkg / "iir2d_jax.dll",
-        repo_root / "build_wsl" / "libiir2d_jax.so",
-        repo_root / "build_win_ninja" / "iir2d_jax.dll",
-        repo_root / "build_win_vs2019" / "Release" / "iir2d_jax.dll",
-    ]
+    if os.name == "nt":
+        candidates = [
+            pkg / "iir2d_jax.dll",
+            repo_root / "build_win_ninja" / "iir2d_jax.dll",
+            repo_root / "build_win_vs2019" / "Release" / "iir2d_jax.dll",
+            pkg / "libiir2d_jax.so",
+            pkg / "iir2d_jax.so",
+            repo_root / "build_wsl" / "libiir2d_jax.so",
+        ]
+    else:
+        candidates = [
+            pkg / "libiir2d_jax.so",
+            pkg / "iir2d_jax.so",
+            repo_root / "build_wsl" / "libiir2d_jax.so",
+            pkg / "iir2d_jax.dll",
+            repo_root / "build_win_ninja" / "iir2d_jax.dll",
+            repo_root / "build_win_vs2019" / "Release" / "iir2d_jax.dll",
+        ]
     for p in candidates:
         if p.exists():
             return p

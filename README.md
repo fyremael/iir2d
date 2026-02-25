@@ -78,16 +78,21 @@ CI:
    1. Linux: `self-hosted`, `linux`, `x64`, `gpu`, `cuda`
    2. Windows: `self-hosted`, `windows`, `x64`, `gpu`, `cuda`
 4. Runner provisioning and validation checklist: `RUNNER_SETUP.md`
-5. Python quality gates:
+5. Nightly full-matrix perf regression:
+   1. `.github/workflows/nightly-perf-regression.yml`
+   2. Compares against baseline `release_records/artifacts/benchmark_baselines/core_protocol_v1.csv`.
+   3. Uploads both benchmark CSV and markdown trend report artifacts.
+6. Python quality gates:
    1. `.github/workflows/quality-gates.yml` runs ruff lint + pytest coverage on core harness modules.
    2. Local run:
 ```bash
 python3 -m pip install -r requirements-dev.txt
-python3 -m ruff check scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py tests
+python3 -m ruff check scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py scripts/check_perf_regression_matrix.py tests
 python3 -m pytest tests \
   --cov=scripts.iir2d_cpu_reference \
   --cov=scripts.build_benchmark_claims_packet \
   --cov=scripts.check_perf_regression \
+  --cov=scripts.check_perf_regression_matrix \
   --cov-report=term-missing \
   --cov-fail-under=85
 ```
@@ -97,7 +102,7 @@ Use the C API benchmark harness to produce reproducible p50/p95 latency and thro
 
 ```bash
 python3 scripts/benchmark_core_cuda.py \
-  --sizes 1024x1024,2048x2048 \
+  --sizes 512x512,1024x1024,2048x2048 \
   --filter_ids 1,4,8 \
   --border_modes mirror \
   --precisions f32,mixed \
@@ -120,7 +125,18 @@ Build a publishable claims packet from a benchmark CSV:
 python3 scripts/build_benchmark_claims_packet.py \
   --in_csv /tmp/iir2d_core_bench.csv \
   --out_md /tmp/iir2d_claims_packet.md \
-  --benchmark_command "python3 scripts/benchmark_core_cuda.py --sizes 1024x1024,2048x2048 --filter_ids 1,4,8 --border_modes mirror --precisions f32,mixed --warmup 10 --iters 50 --out_csv /tmp/iir2d_core_bench.csv"
+  --benchmark_command "python3 scripts/benchmark_core_cuda.py --sizes 512x512,1024x1024,2048x2048 --filter_ids 1,4,8 --border_modes mirror --precisions f32,mixed --warmup 10 --iters 50 --out_csv /tmp/iir2d_core_bench.csv"
+```
+
+Nightly full-matrix trend check (same workload matrix):
+```bash
+python3 scripts/check_perf_regression_matrix.py \
+  --current_csv /tmp/iir2d_core_bench.csv \
+  --baseline_csv release_records/artifacts/benchmark_baselines/core_protocol_v1.csv \
+  --metric latency_ms_p50 \
+  --direction lower_is_better \
+  --max_regression_pct 25.0 \
+  --out_report /tmp/iir2d_core_bench_trend_report.md
 ```
 
 ## CPU Parity Contract + Validator

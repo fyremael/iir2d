@@ -1,4 +1,4 @@
-# IIR2D Core Benchmark Protocol (v1.1)
+# IIR2D Core Benchmark Protocol (v1.2)
 
 ## Purpose
 This protocol defines how to generate external-facing performance claims for the CUDA core API.
@@ -71,6 +71,7 @@ python scripts\benchmark_core_cuda.py `
 3. Timestamp in UTC.
 4. Optional: raw logs from command execution.
 5. Publishable claims packet in markdown form.
+6. Trend report comparing against approved full-matrix baseline.
 
 ## Claims Packet Build Step
 Use the packet builder to produce an externally shareable summary from a benchmark CSV:
@@ -88,6 +89,25 @@ Required output:
 3. Explicit claim hygiene checklist.
 4. Approval placeholders for Product/GTM/QA.
 
+## Baseline and Trend Comparison
+Approved baseline artifact:
+1. `release_records/artifacts/benchmark_baselines/core_protocol_v1.csv`
+
+Trend comparison command:
+```bash
+python3 scripts/check_perf_regression_matrix.py \
+  --current_csv /tmp/iir2d_core_benchmark_v1.csv \
+  --baseline_csv release_records/artifacts/benchmark_baselines/core_protocol_v1.csv \
+  --metric latency_ms_p50 \
+  --direction lower_is_better \
+  --max_regression_pct 25.0 \
+  --out_report /tmp/iir2d_core_benchmark_v1_trend_report.md
+```
+
+Pass condition:
+1. Worst-case per-scenario latency regression is <= `25.0%`.
+2. Current and baseline matrices have identical case keys.
+
 ## CI Smoke Variant
 For CI validation (not final claim generation), run a reduced sweep:
 1. Size: `512x512`
@@ -95,6 +115,13 @@ For CI validation (not final claim generation), run a reduced sweep:
 3. Precision: `f32`
 4. Warmup: `3`
 5. Iterations: `8`
+
+## Nightly Full-Matrix Automation
+1. Workflow: `.github/workflows/nightly-perf-regression.yml`
+2. Runs standard workload matrix nightly on self-hosted Linux CUDA runner.
+3. Uploads both:
+   1. full benchmark CSV
+   2. trend report markdown
 
 ## Claim Hygiene Checklist
 1. Precision parity between compared systems confirmed.

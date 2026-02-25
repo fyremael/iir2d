@@ -39,7 +39,7 @@ jobs:
       - name: Ruff lint
         shell: bash
         run: |
-          python -m ruff check scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py tests
+          python -m ruff check scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py scripts/check_perf_regression_matrix.py tests
 
       - name: Unit tests with coverage
         shell: bash
@@ -48,5 +48,6 @@ jobs:
             --cov=scripts.iir2d_cpu_reference \
             --cov=scripts.build_benchmark_claims_packet \
             --cov=scripts.check_perf_regression \
+            --cov=scripts.check_perf_regression_matrix \
             --cov-report=term-missing \
             --cov-fail-under=85

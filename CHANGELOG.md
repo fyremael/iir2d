@@ -51,6 +51,8 @@
    2. `tests/test_claims_packet.py`
    3. `tests/test_perf_regression.py`
 23. GitHub quality gate workflow: `.github/workflows/quality-gates.yml`.
+24. Full-matrix regression comparator: `scripts/check_perf_regression_matrix.py`.
+25. Approved full protocol benchmark baseline artifact: `release_records/artifacts/benchmark_baselines/core_protocol_v1.csv`.
 
 ### Changed
 1. Documentation for benchmark execution and runner validation in `README.md` and `RUNNER_SETUP.md`.
@@ -64,6 +66,8 @@
 9. Legal posture finalized to MIT license in `LICENSE`; `NOTICE` now declares project license explicitly.
 10. `GTM-004` moved to in-progress with wave-launch artifacts tracked in `task_board.md`.
 11. `README.md` now includes local lint + coverage commands for harness hardening.
+12. Nightly performance workflow now runs full benchmark protocol matrix and emits trend report artifact using `scripts/check_perf_regression_matrix.py`.
+13. Benchmark protocol upgraded to v1.2 with baseline + trend-comparison contract.
 
 ## [1.0.0] - 2026-02-24
 ### Added

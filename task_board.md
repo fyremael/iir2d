@@ -16,7 +16,7 @@ Status values: `in_progress`, `blocked`, `done`
 | ID | Task | Owner | Status | Acceptance Criteria |
 |---|---|---|---|---|
 | ENG-006 | CI pipeline for build + tests + benchmark smoke | Platform Engineer | done | Self-hosted CUDA runners registered (Linux + Windows), `IIR2D_USE_SELF_HOSTED=true`, and two consecutive self-hosted runs succeeded (`#4`, `#5`) with benchmark artifact evidence |
-| ENG-007 | Nightly performance regression jobs on reference GPUs | Platform Engineer | done | Scheduled workflow `nightly-perf-regression.yml` archives nightly benchmark artifact and fails on regression threshold breach |
+| ENG-007 | Nightly performance regression jobs on reference GPUs | Platform Engineer | done | Nightly workflow runs full benchmark protocol matrix, compares vs committed baseline (`core_protocol_v1.csv`), and uploads CSV + trend report artifacts |
 | ENG-008 | Linux binary packaging and install docs | Platform Engineer | done | Linux packaging/install guide published in `PACKAGING_LINUX.md` with one-command consume path |
 | ENG-009 | Windows binary packaging and install docs | Platform Engineer | done | Windows packaging/install guide published in `PACKAGING_WINDOWS.md` with one-command consume path |
 | ENG-010 | Compatibility matrix (CUDA/driver/GPU/OS) | Product Lead | done | Matrix published and versioned in `COMPATIBILITY_MATRIX.md` |

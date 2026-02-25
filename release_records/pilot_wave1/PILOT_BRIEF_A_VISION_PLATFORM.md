@@ -30,6 +30,6 @@ The team has a latency-sensitive image pre/post-processing stage and needs a det
 3. Week 3: decision checkpoint (`proceed`, `extend`, `stop`).
 
 ## Next Actions
-1. Send Day 0 outreach with `PRODUCT_ONE_PAGER.md` and 30-minute discovery request.
+1. Send Day 0 outreach with `docs/PRODUCT_ONE_PAGER.md` and 30-minute discovery request.
 2. Pre-build target-specific claims packet from benchmark harness output.
 3. Lock decision date before pilot start.

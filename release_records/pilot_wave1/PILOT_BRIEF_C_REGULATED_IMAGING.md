@@ -30,6 +30,6 @@ The team needs deterministic behavior, reproducible evidence, and explicit error
 3. Week 3: compliance/operability review + decision.
 
 ## Next Actions
-1. Send Day 0 outreach with `COMPATIBILITY_MATRIX.md`, `SECURITY.md`, and one-pager.
+1. Send Day 0 outreach with `docs/COMPATIBILITY_MATRIX.md`, `docs/SECURITY.md`, and one-pager.
 2. Predefine evidence folders for audit retention.
 3. Require named technical approver and procurement approver at kickoff.

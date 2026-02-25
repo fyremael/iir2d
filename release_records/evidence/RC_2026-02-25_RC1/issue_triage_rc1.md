@@ -4,7 +4,7 @@ Date (UTC): 2026-02-25
 Reviewer: Codex session (pre-sign-off triage)
 
 ## Inputs Reviewed
-1. `task_board.md` risks/blockers log.
+1. `docs/task_board.md` risks/blockers log.
 2. Latest local gate evidence logs in this directory.
 3. Local build/smoke outcomes for Linux and Windows status path.
 

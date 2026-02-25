@@ -58,6 +58,9 @@
    1. `tests/test_core_harness.py`
    2. `tests/test_validate_cuda_cpu_matrix.py`
 28. Visual demo surface in `visual_showcase/index.html` with curated filter outputs and benchmark charts.
+29. Asset size policy gate script and tests:
+   1. `scripts/check_asset_sizes.py`
+   2. `tests/test_check_asset_sizes.py`
 
 ### Changed
 1. Documentation for benchmark execution and runner validation in `README.md` and `RUNNER_SETUP.md`.
@@ -76,6 +79,9 @@
 14. `scripts/benchmark_core_cuda.py` and `scripts/validate_cuda_cpu_matrix.py` now consume a shared harness contract from `scripts/core_harness.py`.
 15. Quality gates now lint and enforce coverage on `scripts.core_harness` and `scripts.validate_cuda_cpu_matrix`.
 16. `README.md` now includes a `Visual Showcase` launch path for live commercialization demos.
+17. Repository markdown docs moved under `docs/` with `README.md` restored at repo root for GitHub landing-page rendering.
+18. Quality gates now enforce tracked image asset size policy at `<=25 MiB` per file.
+19. `visual_showcase/assets/` switched from PNG-heavy payloads to compressed WebP assets for lighter demo delivery.
 
 ## [1.0.0] - 2026-02-24
 ### Added

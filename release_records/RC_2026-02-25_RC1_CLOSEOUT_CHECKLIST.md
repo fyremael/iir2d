@@ -17,7 +17,7 @@ Use this list to move `RC_2026-02-25_RC1` from `hold` to `promote`.
 - [x] Set `Final decision` in `release_records/RC_2026-02-25_RC1.md` to `promote` or `hold`.
 - [x] Update decision timestamp (UTC).
 - [x] Update decision owner.
-- [x] If promoted, update `task_board.md` status notes for `REL-001`.
+- [x] If promoted, update `docs/task_board.md` status notes for `REL-001`.
 - [x] If held, keep blockers listed under follow-ups with owner/date. (`N/A - promoted`)
 
 ## Fast Path

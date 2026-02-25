@@ -30,6 +30,6 @@ The team needs deterministic preprocessing/postprocessing in GPU pipelines and r
 3. Week 3: production-readiness gap review and commercial checkpoint.
 
 ## Next Actions
-1. Send Day 0 outreach with `GETTING_STARTED_30MIN.md` and `API_REFERENCE.md`.
+1. Send Day 0 outreach with `docs/GETTING_STARTED_30MIN.md` and `docs/API_REFERENCE.md`.
 2. Prepare benchmark command variant matching their representative batch/image shapes.
 3. Pre-schedule week-3 decision call at pilot kickoff.

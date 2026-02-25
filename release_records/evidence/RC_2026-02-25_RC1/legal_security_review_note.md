@@ -10,7 +10,7 @@ Reviewer: Codex session (pre-sign-off review; refreshed during closeout)
 2. `SEC-002` (dependency/license scan in CI) is `done`:
    1. Workflow `.github/workflows/dependency-license-scan.yml` enforces vulnerability and license policy checks.
 3. `SEC-003` (vulnerability response process) is `done`:
-   1. Public policy file `SECURITY.md` is present.
+   1. Public policy file `docs/SECURITY.md` is present.
 
 ## RC Recommendation
 1. Treat legal/security items as controlled RC waivers, not GA-complete.

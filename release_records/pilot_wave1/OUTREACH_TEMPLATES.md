@@ -17,7 +17,7 @@ Best,
 Subject: Re: CUDA image pipeline pilot (benchmark protocol attached)
 
 Sharing the benchmark protocol and claim-evidence process we use so results are auditable:
-1. `BENCHMARK_PROTOCOL.md`
+1. `docs/BENCHMARK_PROTOCOL.md`
 2. claims packet workflow (`scripts/build_benchmark_claims_packet.py`)
 
 If you share your representative shape/filter path, we can pre-scope the exact workload matrix before kickoff.

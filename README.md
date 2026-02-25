@@ -7,21 +7,21 @@ This folder provides native CUDA hooks for the IIR2D filters:
 The CUDA core uses a simple, per-row recursive implementation (correctness-first).
 
 Usage guide:
-1. `USAGE_GUIDE.md` (annotated operational runbook with intuition pumps)
+1. `docs/USAGE_GUIDE.md` (annotated operational runbook with intuition pumps)
 
 Commercialization docs:
-1. `PRODUCT_ONE_PAGER.md`
-2. `GETTING_STARTED_30MIN.md`
-3. `API_REFERENCE.md`
-4. `TROUBLESHOOTING.md`
-5. `COMPATIBILITY_MATRIX.md`
-6. `GTM_ICP_RUBRIC.md`
-7. `DESIGN_PARTNER_PILOT_TEMPLATE.md`
-8. `PRICING_AND_PACKAGING.md`
-9. `PILOT_TO_PAID_PLAYBOOK.md`
-10. `PACKAGING_LINUX.md`
-11. `PACKAGING_WINDOWS.md`
-12. `PILOT_WAVE1_EXECUTION.md`
+1. `docs/PRODUCT_ONE_PAGER.md`
+2. `docs/GETTING_STARTED_30MIN.md`
+3. `docs/API_REFERENCE.md`
+4. `docs/TROUBLESHOOTING.md`
+5. `docs/COMPATIBILITY_MATRIX.md`
+6. `docs/GTM_ICP_RUBRIC.md`
+7. `docs/DESIGN_PARTNER_PILOT_TEMPLATE.md`
+8. `docs/PRICING_AND_PACKAGING.md`
+9. `docs/PILOT_TO_PAID_PLAYBOOK.md`
+10. `docs/PACKAGING_LINUX.md`
+11. `docs/PACKAGING_WINDOWS.md`
+12. `docs/PILOT_WAVE1_EXECUTION.md`
 13. `visual_showcase/index.html`
 
 ## Build (Linux)
@@ -78,7 +78,7 @@ CI:
 3. Required runner labels:
    1. Linux: `self-hosted`, `linux`, `x64`, `gpu`, `cuda`
    2. Windows: `self-hosted`, `windows`, `x64`, `gpu`, `cuda`
-4. Runner provisioning and validation checklist: `RUNNER_SETUP.md`
+4. Runner provisioning and validation checklist: `docs/RUNNER_SETUP.md`
 5. Nightly full-matrix perf regression:
    1. `.github/workflows/nightly-perf-regression.yml`
    2. Compares against baseline `release_records/artifacts/benchmark_baselines/core_protocol_v1.csv`.
@@ -88,7 +88,8 @@ CI:
    2. Local run:
 ```bash
 python3 -m pip install -r requirements-dev.txt
-python3 -m ruff check scripts/core_harness.py scripts/benchmark_core_cuda.py scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py scripts/check_perf_regression_matrix.py tests
+python3 scripts/check_asset_sizes.py --max_mb 25
+python3 -m ruff check scripts/core_harness.py scripts/benchmark_core_cuda.py scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py scripts/check_perf_regression_matrix.py scripts/check_asset_sizes.py tests
 python3 -m pytest tests \
   --cov=scripts.core_harness \
   --cov=scripts.iir2d_cpu_reference \
@@ -96,6 +97,7 @@ python3 -m pytest tests \
   --cov=scripts.build_benchmark_claims_packet \
   --cov=scripts.check_perf_regression \
   --cov=scripts.check_perf_regression_matrix \
+  --cov=scripts.check_asset_sizes \
   --cov-report=term-missing \
   --cov-fail-under=85
 ```
@@ -120,7 +122,7 @@ CSV columns include:
 3. Environment metadata: host/platform/python/CUDA runtime + driver/GPU model/`nvcc` release/library path.
 
 Claim publication protocol:
-1. `BENCHMARK_PROTOCOL.md`
+1. `docs/BENCHMARK_PROTOCOL.md`
 2. Claims packet generator: `scripts/build_benchmark_claims_packet.py`
 
 Build a publishable claims packet from a benchmark CSV:
@@ -144,7 +146,7 @@ python3 scripts/check_perf_regression_matrix.py \
 
 ## CPU Parity Contract + Validator
 Canonical CPU parity contract:
-1. `CPU_REFERENCE_DECISION.md`
+1. `docs/CPU_REFERENCE_DECISION.md`
 
 Run CUDA-vs-CPU matrix validation:
 ```bash
@@ -157,8 +159,8 @@ python3 scripts/validate_cuda_cpu_matrix.py \
 ```
 
 Release governance:
-1. `RELEASE_GATE_POLICY.md`
-2. `RELEASE_CHECKLIST.md`
+1. `docs/RELEASE_GATE_POLICY.md`
+2. `docs/RELEASE_CHECKLIST.md`
 3. Executed records: `release_records/`
 
 ## Visual Showcase
@@ -168,6 +170,8 @@ Run a polished static demo page with side-by-side filter reveals and benchmark c
 python3 -m http.server 8080
 # open http://localhost:8080/visual_showcase/
 ```
+
+Tracked showcase image assets are policy-gated at `<=25 MiB` per file (`scripts/check_asset_sizes.py`).
 
 ## Usage
 
@@ -212,7 +216,7 @@ y = iir2d(x, filter_id=4, border="mirror", precision="f32")
   - `IIR2D_API_VERSION_MAJOR`
   - `IIR2D_API_VERSION_MINOR`
   - `IIR2D_API_VERSION_PATCH`
-- API/ABI compatibility policy is defined in `ABI_POLICY.md`.
+- API/ABI compatibility policy is defined in `docs/ABI_POLICY.md`.
 
 ## ML Engineer Demo Pack (JAX)
 

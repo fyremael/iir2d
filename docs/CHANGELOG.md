@@ -82,6 +82,7 @@
 17. Repository markdown docs moved under `docs/` with `README.md` restored at repo root for GitHub landing-page rendering.
 18. Quality gates now enforce tracked image asset size policy at `<=25 MiB` per file.
 19. `visual_showcase/assets/` switched from PNG-heavy payloads to compressed WebP assets for lighter demo delivery.
+20. `visual_showcase/index.html` redesigned as a new interactive showcase surface with scene tabs, split-view theater, and refreshed visual system.
 
 ## [1.0.0] - 2026-02-24
 ### Added

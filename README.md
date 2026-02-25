@@ -6,6 +6,9 @@ This folder provides native CUDA hooks for the IIR2D filters:
 
 The CUDA core uses a simple, per-row recursive implementation (correctness-first).
 
+Usage guide:
+1. `USAGE_GUIDE.md` (annotated operational runbook with intuition pumps)
+
 ## Build (Linux)
 
 ### PyTorch

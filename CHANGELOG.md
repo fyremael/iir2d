@@ -13,6 +13,7 @@
 9. RC1 closeout execution docs: `release_records/RC_2026-02-25_RC1_SIGNOFF_REQUESTS.md` and `release_records/RC_2026-02-25_RC1_CLOSEOUT_CHECKLIST.md`.
 10. RC1 promotion decision recorded in `release_records/RC_2026-02-25_RC1.md`.
 11. Initial legal/security scaffolding: `LICENSE`, `NOTICE`, and `SECURITY.md`.
+12. Annotated usage runbook with intuition pumps in `USAGE_GUIDE.md`.
 
 ### Changed
 1. Documentation for benchmark execution and runner validation in `README.md` and `RUNNER_SETUP.md`.

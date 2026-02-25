@@ -19,8 +19,20 @@ on:
       - ".github/workflows/cuda-cross-platform.yml"
 
 jobs:
+  enforce_self_hosted_cuda_policy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require self-hosted CUDA mode
+        shell: bash
+        run: |
+          if [ "${{ vars.IIR2D_USE_SELF_HOSTED }}" != "true" ]; then
+            echo "IIR2D_USE_SELF_HOSTED must be set to true for this workflow."
+            echo "CUDA parity and GPU E2E smoke are required on every push/PR."
+            exit 1
+          fi
+
   linux_cuda_build_smoke:
-    if: ${{ vars.IIR2D_USE_SELF_HOSTED == 'true' }}
+    needs: enforce_self_hosted_cuda_policy
     runs-on: [self-hosted, linux, x64, gpu, cuda]
     steps:
       - name: Checkout
@@ -53,35 +65,58 @@ jobs:
             --precisions f32,mixed,f64 \
             --border_const 0.125
 
+      - name: Video pipeline GPU E2E smoke (Linux)
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v ffmpeg >/dev/null 2>&1 || { echo "ffmpeg missing from PATH"; exit 1; }
+          command -v ffprobe >/dev/null 2>&1 || { echo "ffprobe missing from PATH"; exit 1; }
+
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i "testsrc2=duration=4:size=640x360:rate=30" \
+            -c:v libx264 -pix_fmt yuv420p /tmp/iir2d_video_smoke_input.mp4
+
+          python3 scripts/video_demo_cuda_pipeline.py \
+            --in_video /tmp/iir2d_video_smoke_input.mp4 \
+            --out_video /tmp/iir2d_video_smoke_output.mp4 \
+            --filter_id 4 \
+            --border_mode mirror \
+            --precision f32 \
+            --temporal_ema_alpha 0.95 \
+            --codec libx264 \
+            --preset medium \
+            --crf 18
+
+          python3 scripts/benchmark_video_cuda_pipeline.py \
+            --in_video /tmp/iir2d_video_smoke_input.mp4 \
+            --out_csv /tmp/iir2d_video_bench_smoke.csv \
+            --filter_id 4 \
+            --border_mode mirror \
+            --precision f32 \
+            --mode full \
+            --codec libx264 \
+            --encode_sink null \
+            --warmup_frames 8 \
+            --timed_frames 32 \
+            --report_every 0
+
       - name: Upload benchmark artifact (Linux)
         uses: actions/upload-artifact@v4
         with:
           name: linux-core-benchmark-smoke
           path: /tmp/iir2d_core_bench_smoke.csv
 
-  linux_cuda_build_smoke_hosted_bootstrap:
-    if: ${{ vars.IIR2D_USE_SELF_HOSTED != 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: CI control-plane smoke (Linux hosted fallback)
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo "IIR2D_USE_SELF_HOSTED is not true; running hosted fallback."
-          test -f scripts/benchmark_core_cuda.py
-          test -f scripts/build_and_smoke_wsl.sh
-
-      - name: Upload benchmark artifact (Linux hosted fallback)
+      - name: Upload video benchmark artifacts (Linux)
         uses: actions/upload-artifact@v4
         with:
-          name: linux-core-benchmark-smoke
-          path: release_records/artifacts/RC_2026-02-25_RC1/pass2_linux_core_benchmark_smoke.csv
+          name: linux-video-benchmark-smoke
+          path: |
+            /tmp/iir2d_video_smoke_input.mp4
+            /tmp/iir2d_video_smoke_output.mp4
+            /tmp/iir2d_video_bench_smoke.csv
 
   windows_cuda_build_smoke:
-    if: ${{ vars.IIR2D_USE_SELF_HOSTED == 'true' }}
+    needs: enforce_self_hosted_cuda_policy
     runs-on: [self-hosted, windows, x64, gpu, cuda]
     steps:
       - name: Checkout
@@ -91,18 +126,3 @@ jobs:
         shell: pwsh
         run: |
           powershell -ExecutionPolicy Bypass -File .\scripts\build_and_smoke_windows.ps1 -SkipGpuSmoke
-
-  windows_cuda_build_smoke_hosted_bootstrap:
-    if: ${{ vars.IIR2D_USE_SELF_HOSTED != 'true' }}
-    runs-on: windows-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: CI control-plane smoke (Windows hosted fallback)
-        shell: pwsh
-        run: |
-          Write-Host "IIR2D_USE_SELF_HOSTED is not true; running hosted fallback."
-          if (-not (Test-Path .\scripts\build_and_smoke_windows.ps1)) {
-            throw "missing scripts/build_and_smoke_windows.ps1"
-          }

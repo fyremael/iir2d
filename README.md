@@ -68,22 +68,22 @@ Prerequisites:
 3. Python (`python3` on Linux/WSL, `python` on Windows)
 
 CI:
-1. `.github/workflows/cuda-cross-platform.yml` supports two modes:
-   1. Self-hosted CUDA mode (`IIR2D_USE_SELF_HOSTED=true`): Linux + Windows CUDA jobs run.
-   2. Hosted fallback mode (default): control-plane validation only; self-hosted CUDA jobs are skipped.
+1. `.github/workflows/cuda-cross-platform.yml` requires self-hosted CUDA mode (`IIR2D_USE_SELF_HOSTED=true`) on push/PR.
 2. CI policy:
    1. Linux job runs full smoke (`scripts/build_and_smoke_wsl.sh`).
-   2. Windows job runs status-only smoke (`scripts/build_and_smoke_windows.ps1 -SkipGpuSmoke`).
-   3. Hosted fallback uploads a benchmark artifact from repository evidence path for audit continuity.
+   2. Linux job runs CUDA-vs-CPU parity matrix over filter IDs `1..8`.
+   3. Linux job runs real GPU video E2E smoke (decode -> CUDA IIR2D -> encode) and uploads video benchmark artifacts.
+   4. Windows job runs status-only smoke (`scripts/build_and_smoke_windows.ps1 -SkipGpuSmoke`).
 3. Required runner labels:
    1. Linux: `self-hosted`, `linux`, `x64`, `gpu`, `cuda`
    2. Windows: `self-hosted`, `windows`, `x64`, `gpu`, `cuda`
 4. Runner provisioning and validation checklist: `docs/RUNNER_SETUP.md`
 5. Nightly full-matrix perf regression:
    1. `.github/workflows/nightly-perf-regression.yml`
-   2. Compares against baseline `release_records/artifacts/benchmark_baselines/core_protocol_v1.csv`.
-   3. Uploads both benchmark CSV and markdown trend report artifacts.
-   4. Runs CUDA-vs-CPU parity matrix over filter IDs `1..8` before benchmarking.
+   2. Runs CUDA-vs-CPU parity matrix over filter IDs `1..8` before benchmarking.
+   3. Generates an all-8-filter benchmark matrix artifact (`/tmp/iir2d_core_bench_nightly_all8.csv`).
+   4. Runs baseline-compatible protocol subset (`filter_ids=1,4,8`) for regression checks against `release_records/artifacts/benchmark_baselines/core_protocol_v1.csv`.
+   5. Uploads all benchmark CSV artifacts and markdown trend report.
 6. Python quality gates:
    1. `.github/workflows/quality-gates.yml` runs ruff lint + pytest coverage on core harness modules.
    2. Local run:
@@ -175,6 +175,7 @@ python3 -m http.server 8080
 ```
 
 Tracked showcase image assets are policy-gated at `<=25 MiB` per file (`scripts/check_asset_sizes.py`).
+Committed sample video artifacts for showcase/demo live under `visual_showcase/assets/video_demo/`.
 
 ## Video Demo (CUDA C API)
 Run decode -> CUDA IIR2D (per RGB channel) -> encode:

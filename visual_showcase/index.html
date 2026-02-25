@@ -313,6 +313,46 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
+    .video-grid {
+      padding: 1rem;
+      display: grid;
+      gap: 0.9rem;
+      grid-template-columns: 280px 1fr;
+      align-items: start;
+    }
+
+    .video-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(10, 25, 40, 0.8);
+      padding: 0.68rem;
+    }
+
+    .video-select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0.54rem 0.6rem;
+      background: rgba(7, 20, 32, 0.76);
+      color: var(--ink-a);
+      font: 500 0.9rem "Space Grotesk", sans-serif;
+    }
+
+    .video-stage {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(10, 25, 40, 0.8);
+      padding: 0.7rem;
+    }
+
+    .video-stage video {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid rgba(93, 224, 232, 0.35);
+      background: #020810;
+      display: block;
+    }
+
     .chart {
       border: 1px solid var(--line);
       border-radius: var(--radius-md);
@@ -357,6 +397,10 @@
       }
 
       .charts {
+        grid-template-columns: 1fr;
+      }
+
+      .video-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -458,6 +502,21 @@
       </div>
     </section>
 
+    <section class="section">
+      <p class="section-head">Video Theater</p>
+      <div class="video-grid">
+        <aside class="video-card">
+          <label class="label" for="videoSelect">Clip</label>
+          <select id="videoSelect" class="video-select"></select>
+          <p class="note" id="videoNote"></p>
+        </aside>
+        <div class="video-stage">
+          <video id="videoPlayer" controls preload="metadata" playsinline></video>
+          <div id="videoCaption" class="scene-caption"></div>
+        </div>
+      </div>
+    </section>
+
     <p class="footer">launch: <code>python -m http.server 8080</code> then open <code>http://localhost:8080/visual_showcase/</code></p>
   </main>
 
@@ -500,9 +559,35 @@
     const splitLine = document.getElementById("splitLine");
     const sceneNote = document.getElementById("sceneNote");
     const sceneCaption = document.getElementById("sceneCaption");
+    const videoSelect = document.getElementById("videoSelect");
+    const videoPlayer = document.getElementById("videoPlayer");
+    const videoNote = document.getElementById("videoNote");
+    const videoCaption = document.getElementById("videoCaption");
+
+    const videos = [
+      {
+        name: "Original | F1 | F4 | F8",
+        caption: "Left to right: original, F1 (natural), F4, F8.",
+        note: "Use this clip to pick default product profile quickly; F1 is best for natural footage.",
+        src: "assets/video_demo/compare_portrait_original_f1_f4_f8.mp4",
+      },
+      {
+        name: "Original vs F1 Natural",
+        caption: "Side-by-side comparison for the recommended natural profile.",
+        note: "F1 retains structure while reducing the severe block artifacts seen in stronger filters.",
+        src: "assets/video_demo/compare_portrait_input_vs_iir2d_f1_natural.mp4",
+      },
+      {
+        name: "F1 Output Only",
+        caption: "Processed output stream (no split-screen).",
+        note: "Use this when sharing direct output examples with partners.",
+        src: "assets/video_demo/output_portrait_zoom_iir2d_f1_natural.mp4",
+      },
+    ];
 
     let sceneIndex = 0;
     let mode = "split";
+    let videoIndex = 0;
 
     function setActiveMode(next) {
       mode = next;
@@ -543,6 +628,14 @@
       }
     }
 
+    function renderVideo() {
+      const clip = videos[videoIndex];
+      videoPlayer.src = clip.src;
+      videoCaption.textContent = clip.caption;
+      videoNote.textContent = clip.note;
+      videoPlayer.load();
+    }
+
     scenes.forEach((scene, index) => {
       const btn = document.createElement("button");
       btn.type = "button";
@@ -558,8 +651,19 @@
 
     modes.forEach((btn) => btn.addEventListener("click", () => setActiveMode(btn.dataset.mode)));
     split.addEventListener("input", render);
+    videos.forEach((clip, index) => {
+      const opt = document.createElement("option");
+      opt.value = String(index);
+      opt.textContent = clip.name;
+      videoSelect.append(opt);
+    });
+    videoSelect.addEventListener("change", () => {
+      videoIndex = Number(videoSelect.value);
+      renderVideo();
+    });
 
     render();
+    renderVideo();
   </script>
 </body>
 </html>

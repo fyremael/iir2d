@@ -27,7 +27,19 @@ jobs:
             --precisions f32,mixed,f64 \
             --border_const 0.125
 
-      - name: Run nightly benchmark full matrix
+      - name: Run nightly benchmark all-8 filter matrix
+        shell: bash
+        run: |
+          python3 scripts/benchmark_core_cuda.py \
+            --sizes 512x512,1024x1024,2048x2048 \
+            --filter_ids 1,2,3,4,5,6,7,8 \
+            --border_modes mirror \
+            --precisions f32,mixed \
+            --warmup 10 \
+            --iters 50 \
+            --out_csv /tmp/iir2d_core_bench_nightly_all8.csv
+
+      - name: Run nightly benchmark protocol subset (baseline-compatible)
         shell: bash
         run: |
           python3 scripts/benchmark_core_cuda.py \
@@ -55,5 +67,6 @@ jobs:
         with:
           name: nightly-linux-core-benchmark
           path: |
+            /tmp/iir2d_core_bench_nightly_all8.csv
             /tmp/iir2d_core_bench_nightly_full_matrix.csv
             /tmp/iir2d_core_bench_nightly_trend_report.md

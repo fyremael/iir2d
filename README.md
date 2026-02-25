@@ -83,6 +83,7 @@ CI:
    1. `.github/workflows/nightly-perf-regression.yml`
    2. Compares against baseline `release_records/artifacts/benchmark_baselines/core_protocol_v1.csv`.
    3. Uploads both benchmark CSV and markdown trend report artifacts.
+   4. Runs CUDA-vs-CPU parity matrix over filter IDs `1..8` before benchmarking.
 6. Python quality gates:
    1. `.github/workflows/quality-gates.yml` runs ruff lint + pytest coverage on core harness modules.
    2. Local run:

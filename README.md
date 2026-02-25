@@ -78,6 +78,19 @@ CI:
    1. Linux: `self-hosted`, `linux`, `x64`, `gpu`, `cuda`
    2. Windows: `self-hosted`, `windows`, `x64`, `gpu`, `cuda`
 4. Runner provisioning and validation checklist: `RUNNER_SETUP.md`
+5. Python quality gates:
+   1. `.github/workflows/quality-gates.yml` runs ruff lint + pytest coverage on core harness modules.
+   2. Local run:
+```bash
+python3 -m pip install -r requirements-dev.txt
+python3 -m ruff check scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py tests
+python3 -m pytest tests \
+  --cov=scripts.iir2d_cpu_reference \
+  --cov=scripts.build_benchmark_claims_packet \
+  --cov=scripts.check_perf_regression \
+  --cov-report=term-missing \
+  --cov-fail-under=85
+```
 
 ## Core Benchmark Harness (Commercialization Baseline)
 Use the C API benchmark harness to produce reproducible p50/p95 latency and throughput, with environment metadata attached to every row:

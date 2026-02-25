@@ -43,6 +43,14 @@
    3. `release_records/pilot_wave1/PILOT_BRIEF_A_VISION_PLATFORM.md`
    4. `release_records/pilot_wave1/PILOT_BRIEF_B_ML_INFRA.md`
    5. `release_records/pilot_wave1/PILOT_BRIEF_C_REGULATED_IMAGING.md`
+21. Python quality toolchain files:
+   1. `requirements-dev.txt`
+   2. `pyproject.toml`
+22. Python unit tests:
+   1. `tests/test_cpu_reference.py`
+   2. `tests/test_claims_packet.py`
+   3. `tests/test_perf_regression.py`
+23. GitHub quality gate workflow: `.github/workflows/quality-gates.yml`.
 
 ### Changed
 1. Documentation for benchmark execution and runner validation in `README.md` and `RUNNER_SETUP.md`.
@@ -55,6 +63,7 @@
 8. Benchmark protocol upgraded to v1.1 with claim packet generation and sign-off workflow in `BENCHMARK_PROTOCOL.md`.
 9. Legal posture finalized to MIT license in `LICENSE`; `NOTICE` now declares project license explicitly.
 10. `GTM-004` moved to in-progress with wave-launch artifacts tracked in `task_board.md`.
+11. `README.md` now includes local lint + coverage commands for harness hardening.
 
 ## [1.0.0] - 2026-02-24
 ### Added

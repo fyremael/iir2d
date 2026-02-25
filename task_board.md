@@ -20,6 +20,7 @@ Status values: `in_progress`, `blocked`, `done`
 | ENG-008 | Linux binary packaging and install docs | Platform Engineer | done | Linux packaging/install guide published in `PACKAGING_LINUX.md` with one-command consume path |
 | ENG-009 | Windows binary packaging and install docs | Platform Engineer | done | Windows packaging/install guide published in `PACKAGING_WINDOWS.md` with one-command consume path |
 | ENG-010 | Compatibility matrix (CUDA/driver/GPU/OS) | Product Lead | done | Matrix published and versioned in `COMPATIBILITY_MATRIX.md` |
+| ENG-011 | Add lint and unit-coverage quality gates | Platform Engineer | done | `quality-gates.yml` enforces ruff + pytest coverage (`>=85%` on core harness modules) |
 | SEC-001 | Add LICENSE + third-party NOTICES | Product Lead | done | `LICENSE` finalized as MIT and `NOTICE` updated with project license declaration + third-party notice posture |
 | SEC-002 | Dependency/license scan integrated in CI | Platform Engineer | done | Workflow `dependency-license-scan.yml` added; CI fails on pip-audit vulnerabilities or license policy violations |
 | SEC-003 | Define vulnerability response SLA/process | Product Lead | done | `SECURITY.md` policy merged with reporting path and response SLA |
@@ -52,6 +53,7 @@ Status values: `in_progress`, `blocked`, `done`
 | ENG-004 | CUDA-vs-CPU parity matrix | QA Engineer | done | Matrix validator landed and wired into Linux self-hosted CI (`scripts/validate_cuda_cpu_matrix.py`) |
 | ENG-006 | CI build + smoke runner validation | Platform Engineer | done | Self-hosted runs `#4` and `#5` passed on Linux/Windows CUDA jobs; fallback jobs skipped by design under `IIR2D_USE_SELF_HOSTED=true` |
 | ENG-005 | Benchmark harness v1 | Platform Engineer | done | Core C API harness implemented; sample evidence captured on 2026-02-25 (`/tmp/iir2d_core_bench_smoke.csv`) |
+| ENG-011 | Lint + unit coverage gate | Platform Engineer | done | Added `quality-gates.yml` with ruff lint and pytest coverage threshold on core harness modules |
 | REL-001 | Release gate checklist | Product Lead | done | RC1 promoted using checklist record; CI links, self-hosted evidence, and delegated role sign-offs are recorded |
 | GTM-004 | Design-partner pilot launch (Wave 1) | GTM Lead | in_progress | Outreach templates and 3 pilot briefs prepared in `release_records/pilot_wave1/`; outbound + signed agreements pending |
 

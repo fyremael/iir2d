@@ -99,6 +99,15 @@ CSV columns include:
 
 Claim publication protocol:
 1. `BENCHMARK_PROTOCOL.md`
+2. Claims packet generator: `scripts/build_benchmark_claims_packet.py`
+
+Build a publishable claims packet from a benchmark CSV:
+```bash
+python3 scripts/build_benchmark_claims_packet.py \
+  --in_csv /tmp/iir2d_core_bench.csv \
+  --out_md /tmp/iir2d_claims_packet.md \
+  --benchmark_command "python3 scripts/benchmark_core_cuda.py --sizes 1024x1024,2048x2048 --filter_ids 1,4,8 --border_modes mirror --precisions f32,mixed --warmup 10 --iters 50 --out_csv /tmp/iir2d_core_bench.csv"
+```
 
 ## CPU Parity Contract + Validator
 Canonical CPU parity contract:

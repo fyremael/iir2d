@@ -1,4 +1,4 @@
-# IIR2D Core Benchmark Protocol (v1)
+# IIR2D Core Benchmark Protocol (v1.1)
 
 ## Purpose
 This protocol defines how to generate external-facing performance claims for the CUDA core API.
@@ -70,6 +70,23 @@ python scripts\benchmark_core_cuda.py `
 2. Commit SHA / release tag used for run.
 3. Timestamp in UTC.
 4. Optional: raw logs from command execution.
+5. Publishable claims packet in markdown form.
+
+## Claims Packet Build Step
+Use the packet builder to produce an externally shareable summary from a benchmark CSV:
+
+```bash
+python3 scripts/build_benchmark_claims_packet.py \
+  --in_csv /tmp/iir2d_core_benchmark_v1.csv \
+  --out_md /tmp/iir2d_claims_packet_v1.md \
+  --benchmark_command "python3 scripts/benchmark_core_cuda.py --sizes 512x512,1024x1024,2048x2048 --filter_ids 1,4,8 --border_modes mirror --precisions f32,mixed --warmup 10 --iters 50 --out_csv /tmp/iir2d_core_benchmark_v1.csv"
+```
+
+Required output:
+1. Environment metadata block.
+2. Case-by-case results table.
+3. Explicit claim hygiene checklist.
+4. Approval placeholders for Product/GTM/QA.
 
 ## CI Smoke Variant
 For CI validation (not final claim generation), run a reduced sweep:
@@ -85,3 +102,9 @@ For CI validation (not final claim generation), run a reduced sweep:
 3. No cherry-picking of fastest case only.
 4. Outlier handling disclosed (if applied).
 5. Full CSV attached for review.
+
+## Sign-off Workflow
+1. QA verifies command line + artifact integrity.
+2. Product Lead approves claim wording scope.
+3. GTM Lead approves external messaging context.
+4. Only signed packets may be used in external collateral.

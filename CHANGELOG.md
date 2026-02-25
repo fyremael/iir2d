@@ -36,6 +36,7 @@
 16. Canonical CPU reference contract decision in `CPU_REFERENCE_DECISION.md`.
 17. Canonical CPU reference implementation for filters `1..8` in `scripts/iir2d_cpu_reference.py`.
 18. CUDA-vs-CPU matrix validator in `scripts/validate_cuda_cpu_matrix.py`.
+19. Benchmark claims packet builder in `scripts/build_benchmark_claims_packet.py`.
 
 ### Changed
 1. Documentation for benchmark execution and runner validation in `README.md` and `RUNNER_SETUP.md`.
@@ -45,6 +46,7 @@
 5. RC1 closeout checklist and sign-off tables were finalized with delegated role approvals under Product Lead directive.
 6. Core runtime API now exposes version and build fingerprint query functions, validated in `scripts/smoke_core_status.py`.
 7. Linux self-hosted CI now enforces CUDA-vs-CPU parity matrix validation in `.github/workflows/cuda-cross-platform.yml`.
+8. Benchmark protocol upgraded to v1.1 with claim packet generation and sign-off workflow in `BENCHMARK_PROTOCOL.md`.
 
 ## [1.0.0] - 2026-02-24
 ### Added

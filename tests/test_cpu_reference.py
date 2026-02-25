@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import sys
+
 import numpy as np
 import pytest
 
+import scripts.iir2d_cpu_reference as cpu_ref
 from scripts.iir2d_cpu_reference import iir2d_cpu_reference
 
 
@@ -51,3 +54,95 @@ def test_invalid_inputs_raise() -> None:
         iir2d_cpu_reference(np.zeros((4, 4), dtype=np.float32), filter_id=1, border_mode="bad")
     with pytest.raises(ValueError):
         iir2d_cpu_reference(np.zeros((4, 4), dtype=np.float32), filter_id=1, precision="bad")
+
+
+def test_normalize_border_and_precision_invalid_integer_branches() -> None:
+    with pytest.raises(ValueError):
+        cpu_ref._normalize_border_mode(99)  # noqa: SLF001
+    with pytest.raises(ValueError):
+        cpu_ref._normalize_precision(99)  # noqa: SLF001
+
+
+def test_border_sample_all_modes_and_out_of_bounds() -> None:
+    row = np.asarray([10.0, 20.0, 30.0], dtype=np.float32)
+    assert cpu_ref._border_sample(row, 1, cpu_ref.BORDER_MAP["mirror"], np.float32(7.0)) == np.float32(20.0)  # noqa: SLF001
+    assert cpu_ref._border_sample(row, -1, cpu_ref.BORDER_MAP["constant"], np.float32(7.0)) == np.float32(7.0)  # noqa: SLF001
+    assert cpu_ref._border_sample(row, -7, cpu_ref.BORDER_MAP["clamp"], np.float32(7.0)) == np.float32(10.0)  # noqa: SLF001
+    assert cpu_ref._border_sample(row, -4, cpu_ref.BORDER_MAP["wrap"], np.float32(7.0)) == np.float32(30.0)  # noqa: SLF001
+    assert cpu_ref._border_sample(row, -1, cpu_ref.BORDER_MAP["mirror"], np.float32(7.0)) == np.float32(10.0)  # noqa: SLF001
+
+
+def test_internal_row_biquad_and_statespace_helpers_return_expected_shape() -> None:
+    x = np.asarray([0.1, 0.2, 0.3, 0.4], dtype=np.float32)
+    y_bq = cpu_ref._row_biquad(  # noqa: SLF001
+        x,
+        np.float32(0.2),
+        np.float32(0.2),
+        np.float32(0.2),
+        np.float32(0.3),
+        np.float32(-0.1),
+        cpu_ref.BORDER_MAP["mirror"],
+        np.float32(0.0),
+        np.float32,
+        np.dtype(np.float32),
+    )
+    y_ss = cpu_ref._row_statespace(  # noqa: SLF001
+        x,
+        np.float32(0.2),
+        np.float32(0.2),
+        np.float32(0.2),
+        np.float32(0.3),
+        np.float32(-0.1),
+        cpu_ref.BORDER_MAP["mirror"],
+        np.float32(0.0),
+        np.float32,
+        np.dtype(np.float32),
+    )
+    assert y_bq.shape == x.shape
+    assert y_ss.shape == x.shape
+    assert np.isfinite(y_bq).all()
+    assert np.isfinite(y_ss).all()
+
+
+def test_apply_rows_invalid_filter_branch_raises() -> None:
+    with pytest.raises(ValueError):
+        cpu_ref._apply_rows(  # noqa: SLF001
+            np.ones((2, 3), dtype=np.float32),
+            99,
+            cpu_ref.BORDER_MAP["mirror"],
+            np.float32(0.0),
+            np.float32,
+            np.dtype(np.float32),
+        )
+
+
+def test_reference_rejects_empty_shape() -> None:
+    with pytest.raises(ValueError):
+        iir2d_cpu_reference(np.zeros((0, 4), dtype=np.float32), filter_id=1)
+
+
+def test_cli_main_valid_and_invalid_size(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "iir2d_cpu_reference.py",
+            "--size",
+            "7x5",
+            "--filter_id",
+            "6",
+            "--border_mode",
+            "mirror",
+            "--precision",
+            "f64",
+            "--seed",
+            "2",
+        ],
+    )
+    assert cpu_ref.main() == 0
+    out = capsys.readouterr().out
+    assert "ok: shape=(5, 7)" in out
+
+    monkeypatch.setattr(sys, "argv", ["iir2d_cpu_reference.py", "--size", "bad"])
+    with pytest.raises(ValueError):
+        cpu_ref.main()

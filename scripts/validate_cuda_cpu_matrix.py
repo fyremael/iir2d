@@ -7,14 +7,12 @@ import argparse
 import ctypes
 import os
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable
 
 import numpy as np
-
 from iir2d_cpu_reference import BORDER_MAP, PRECISION_MAP, TOLERANCE_MAP, iir2d_cpu_reference
-
 
 CUDA_MEMCPY_HOST_TO_DEVICE = 1
 CUDA_MEMCPY_DEVICE_TO_HOST = 2

@@ -4,10 +4,9 @@
 from __future__ import annotations
 
 import argparse
-from typing import Callable
+from collections.abc import Callable
 
 import numpy as np
-
 
 BORDER_MAP = {
     "clamp": 0,
@@ -538,5 +537,5 @@ def main() -> int:
     return 0
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     raise SystemExit(main())

@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IIR2D Visual Showcase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-0: #041321;
+      --bg-1: #0b2238;
+      --bg-2: #123957;
+      --ink-0: #eaf4ff;
+      --ink-1: #b6d7f2;
+      --ink-2: #7da6c8;
+      --line: rgba(208, 234, 255, 0.2);
+      --accent-cyan: #57d9ff;
+      --accent-amber: #ffbe63;
+      --accent-mint: #66f2b4;
+      --panel: rgba(5, 23, 37, 0.7);
+      --panel-soft: rgba(14, 42, 64, 0.62);
+      --shadow: 0 18px 46px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      color: var(--ink-0);
+      background:
+        radial-gradient(1200px 500px at 85% -10%, rgba(87, 217, 255, 0.16), transparent 60%),
+        radial-gradient(900px 400px at 0% 0%, rgba(255, 190, 99, 0.1), transparent 60%),
+        linear-gradient(180deg, var(--bg-1), var(--bg-0) 55%, #020d18);
+      font-family: "Archivo", "Segoe UI", sans-serif;
+      min-height: 100%;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(to right, rgba(132, 178, 212, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(132, 178, 212, 0.08) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(circle at 50% 35%, rgba(0, 0, 0, 0.8), transparent 78%);
+      z-index: -1;
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2.2rem 0 3.5rem;
+      animation: rise 680ms ease both;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: clamp(1.2rem, 2.2vw, 2rem);
+      background:
+        linear-gradient(125deg, rgba(10, 44, 69, 0.82), rgba(4, 21, 34, 0.9) 60%),
+        radial-gradient(500px 180px at 85% 10%, rgba(102, 242, 180, 0.2), transparent 70%);
+      box-shadow: var(--shadow);
+    }
+
+    .kicker {
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 700;
+      font-size: 0.78rem;
+      margin: 0;
+    }
+
+    h1 {
+      margin: 0.5rem 0 0.75rem;
+      font-size: clamp(2.05rem, 5.8vw, 4.45rem);
+      line-height: 0.95;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      max-width: 12ch;
+    }
+
+    .sub {
+      margin: 0;
+      color: var(--ink-1);
+      max-width: 70ch;
+      font-size: clamp(1rem, 1.6vw, 1.2rem);
+      line-height: 1.5;
+    }
+
+    .meta {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--line);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      color: var(--ink-2);
+      font-size: 0.84rem;
+      font-family: "Space Mono", Consolas, monospace;
+    }
+
+    .kpi-grid {
+      margin-top: 1.2rem;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.7rem;
+    }
+
+    .kpi {
+      padding: 0.9rem;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel-soft);
+      animation: rise 660ms ease both;
+    }
+
+    .kpi:nth-child(2) { animation-delay: 80ms; }
+    .kpi:nth-child(3) { animation-delay: 140ms; }
+    .kpi:nth-child(4) { animation-delay: 200ms; }
+
+    .kpi .v {
+      display: block;
+      font-size: clamp(1.28rem, 2vw, 1.9rem);
+      line-height: 1;
+      font-weight: 800;
+      color: var(--accent-amber);
+    }
+
+    .kpi .l {
+      display: block;
+      margin-top: 0.35rem;
+      font-size: 0.78rem;
+      color: var(--ink-2);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    section {
+      margin-top: 1.35rem;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .section-head {
+      margin: 0;
+      padding: 0.95rem 1rem;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.82rem;
+      color: var(--ink-2);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-family: "Space Mono", Consolas, monospace;
+    }
+
+    .lab {
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 1rem;
+    }
+
+    .controls {
+      display: grid;
+      gap: 0.9rem;
+      align-content: start;
+    }
+
+    .field {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0.7rem;
+      background: rgba(9, 32, 49, 0.8);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.35rem;
+      font-size: 0.74rem;
+      color: var(--ink-2);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-family: "Space Mono", Consolas, monospace;
+    }
+
+    select,
+    input[type="range"] {
+      width: 100%;
+    }
+
+    select {
+      background: #0d2f49;
+      color: var(--ink-0);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 0.48rem 0.55rem;
+      font: 600 0.95rem "Archivo", sans-serif;
+    }
+
+    .hint {
+      margin: 0.2rem 0 0;
+      font-size: 0.84rem;
+      line-height: 1.45;
+      color: var(--ink-1);
+    }
+
+    .compare {
+      min-height: 420px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #02111f;
+      overflow: hidden;
+      position: relative;
+      aspect-ratio: 16 / 10;
+    }
+
+    .compare img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      image-rendering: auto;
+    }
+
+    .overlay {
+      clip-path: inset(0 50% 0 0);
+    }
+
+    .split-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: linear-gradient(180deg, var(--accent-amber), var(--accent-cyan));
+      transform: translateX(-1px);
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.35);
+    }
+
+    .tag {
+      position: absolute;
+      top: 0.6rem;
+      padding: 0.35rem 0.55rem;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      font: 700 0.69rem "Space Mono", Consolas, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      background: rgba(2, 12, 20, 0.74);
+    }
+
+    .tag.left { left: 0.6rem; color: var(--ink-2); }
+    .tag.right { right: 0.6rem; color: var(--accent-cyan); }
+
+    .charts {
+      padding: 1rem;
+      display: grid;
+      gap: 0.8rem;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .chart {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(6, 25, 40, 0.84);
+    }
+
+    .chart img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .chart p {
+      margin: 0;
+      border-top: 1px solid var(--line);
+      padding: 0.58rem 0.65rem;
+      font: 700 0.72rem "Space Mono", Consolas, monospace;
+      color: var(--ink-2);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .footer {
+      margin-top: 1rem;
+      color: var(--ink-2);
+      font: 400 0.8rem "Space Mono", Consolas, monospace;
+      text-align: right;
+    }
+
+    @media (max-width: 960px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .lab {
+        grid-template-columns: 1fr;
+      }
+
+      .compare {
+        min-height: 0;
+      }
+
+      .charts {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <p class="kicker">Commercial Demo Surface</p>
+      <h1>Faster filters, visible in one screen.</h1>
+      <p class="sub">
+        This page packages baseline benchmark evidence and side-by-side visual effects from the canonical IIR2D filter bank.
+        Designed for pilots and technical buyer walkthroughs.
+      </p>
+      <div class="meta">
+        <span>baseline timestamp: 2026-02-25T10:16:06Z</span>
+        <span>GPU: NVIDIA GeForce RTX 2080</span>
+        <span>CUDA runtime: 11.0</span>
+        <span>protocol cases: 18</span>
+      </div>
+      <div class="kpi-grid">
+        <article class="kpi">
+          <span class="v">0.093 ms</span>
+          <span class="l">Best p50 latency</span>
+        </article>
+        <article class="kpi">
+          <span class="v">7,099 MPix/s</span>
+          <span class="l">Peak throughput</span>
+        </article>
+        <article class="kpi">
+          <span class="v">681 MPix/s</span>
+          <span class="l">Median throughput</span>
+        </article>
+        <article class="kpi">
+          <span class="v">59.4 ms</span>
+          <span class="l">Largest case p50</span>
+        </article>
+      </div>
+    </header>
+
+    <section>
+      <p class="section-head">Visual Lab</p>
+      <div class="lab">
+        <aside class="controls">
+          <div class="field">
+            <label for="sample">Scene</label>
+            <select id="sample"></select>
+          </div>
+          <div class="field">
+            <label for="filter">Filter View</label>
+            <select id="filter">
+              <option value="f4">Filter 4 (balanced)</option>
+              <option value="f8" selected>Filter 8 (sharper)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="split">Reveal Split</label>
+            <input id="split" type="range" min="0" max="100" value="50">
+          </div>
+          <p class="hint">
+            Use split to compare untouched input with filtered output.
+            Switch scenes to demonstrate stability across textures and edge profiles.
+          </p>
+        </aside>
+
+        <div class="compare">
+          <img id="baseImage" alt="Original image">
+          <img id="overlayImage" class="overlay" alt="Filtered image">
+          <div id="splitLine" class="split-line"></div>
+          <div class="tag left">original</div>
+          <div class="tag right" id="overlayTag">filter 8</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="section-head">Benchmark Evidence</p>
+      <div class="charts">
+        <figure class="chart">
+          <img src="../plots/professional/psnr_gain_bar.png" alt="PSNR gain chart">
+          <p>Quality delta</p>
+        </figure>
+        <figure class="chart">
+          <img src="../plots/professional/train_time_bar.png" alt="Train time chart">
+          <p>Training time impact</p>
+        </figure>
+        <figure class="chart">
+          <img src="../plots/professional/loss_curves.png" alt="Loss curves chart">
+          <p>Convergence profile</p>
+        </figure>
+      </div>
+    </section>
+
+    <p class="footer">open with: <code>python -m http.server 8080</code> then browse <code>http://localhost:8080/visual_showcase/</code></p>
+  </main>
+
+  <script>
+    const sampleData = [
+      {
+        label: "Urban texture (0_0_47)",
+        base: "assets/0_0_47/0_0_47_orig.png",
+        f4: "assets/0_0_47/0_0_47_f4.png",
+        f8: "assets/0_0_47/0_0_47_f8.png",
+      },
+      {
+        label: "Street scene (20220414)",
+        base: "assets/20220414203414_0_0_120/20220414203414_0_0_120_orig.png",
+        f4: "assets/20220414203414_0_0_120/20220414203414_0_0_120_f4.png",
+        f8: "assets/20220414203414_0_0_120/20220414203414_0_0_120_f8.png",
+      },
+      {
+        label: "Portrait profile (35e667...)",
+        base: "assets/35e66714-0eeb-4530-a303-3f0c9e726037/35e66714-0eeb-4530-a303-3f0c9e726037_orig.png",
+        f4: "assets/35e66714-0eeb-4530-a303-3f0c9e726037/35e66714-0eeb-4530-a303-3f0c9e726037_f4.png",
+        f8: "assets/35e66714-0eeb-4530-a303-3f0c9e726037/35e66714-0eeb-4530-a303-3f0c9e726037_f8.png",
+      }
+    ];
+
+    const sampleSelect = document.getElementById("sample");
+    const filterSelect = document.getElementById("filter");
+    const split = document.getElementById("split");
+    const baseImage = document.getElementById("baseImage");
+    const overlayImage = document.getElementById("overlayImage");
+    const splitLine = document.getElementById("splitLine");
+    const overlayTag = document.getElementById("overlayTag");
+
+    sampleData.forEach((item, idx) => {
+      const option = document.createElement("option");
+      option.value = String(idx);
+      option.textContent = item.label;
+      sampleSelect.append(option);
+    });
+
+    function render() {
+      const sample = sampleData[Number(sampleSelect.value || 0)];
+      const filter = filterSelect.value;
+      const splitValue = Number(split.value);
+      baseImage.src = sample.base;
+      overlayImage.src = sample[filter];
+      overlayImage.style.clipPath = `inset(0 ${100 - splitValue}% 0 0)`;
+      splitLine.style.left = `${splitValue}%`;
+      overlayTag.textContent = filter === "f4" ? "filter 4" : "filter 8";
+    }
+
+    sampleSelect.addEventListener("change", render);
+    filterSelect.addEventListener("change", render);
+    split.addEventListener("input", render);
+    render();
+  </script>
+</body>
+</html>

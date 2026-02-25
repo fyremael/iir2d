@@ -22,6 +22,7 @@ Commercialization docs:
 10. `PACKAGING_LINUX.md`
 11. `PACKAGING_WINDOWS.md`
 12. `PILOT_WAVE1_EXECUTION.md`
+13. `visual_showcase/index.html`
 
 ## Build (Linux)
 
@@ -159,6 +160,14 @@ Release governance:
 1. `RELEASE_GATE_POLICY.md`
 2. `RELEASE_CHECKLIST.md`
 3. Executed records: `release_records/`
+
+## Visual Showcase
+Run a polished static demo page with side-by-side filter reveals and benchmark charts:
+
+```bash
+python3 -m http.server 8080
+# open http://localhost:8080/visual_showcase/
+```
 
 ## Usage
 

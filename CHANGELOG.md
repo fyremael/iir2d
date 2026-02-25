@@ -57,6 +57,7 @@
 27. Harness-focused unit tests:
    1. `tests/test_core_harness.py`
    2. `tests/test_validate_cuda_cpu_matrix.py`
+28. Visual demo surface in `visual_showcase/index.html` with curated filter outputs and benchmark charts.
 
 ### Changed
 1. Documentation for benchmark execution and runner validation in `README.md` and `RUNNER_SETUP.md`.
@@ -74,6 +75,7 @@
 13. Benchmark protocol upgraded to v1.2 with baseline + trend-comparison contract.
 14. `scripts/benchmark_core_cuda.py` and `scripts/validate_cuda_cpu_matrix.py` now consume a shared harness contract from `scripts/core_harness.py`.
 15. Quality gates now lint and enforce coverage on `scripts.core_harness` and `scripts.validate_cuda_cpu_matrix`.
+16. `README.md` now includes a `Visual Showcase` launch path for live commercialization demos.
 
 ## [1.0.0] - 2026-02-24
 ### Added

@@ -8,9 +8,9 @@ Use this list to move `RC_2026-02-25_RC1` from `hold` to `promote`.
 - [x] Add CI benchmark artifact link to `release_records/RC_2026-02-25_RC1.md` (Evidence placeholder #3).
 - [x] Confirm self-hosted CUDA jobs (Linux + Windows) succeed on the linked runs.
 - [x] Product Lead approves or rejects `WAIVER-RC1-SEC-001-003`.
-- [ ] Core Kernel Engineer fills sign-off row.
-- [ ] Platform Engineer fills sign-off row.
-- [ ] QA Engineer fills sign-off row.
+- [x] Core Kernel Engineer fills sign-off row.
+- [x] Platform Engineer fills sign-off row.
+- [x] QA Engineer fills sign-off row.
 - [x] Product Lead fills sign-off row.
 
 ## Finalization

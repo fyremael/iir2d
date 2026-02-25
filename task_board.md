@@ -10,7 +10,7 @@ Status values: `todo`, `in_progress`, `blocked`, `done`
 | ENG-003 | Implement CPU reference kernels for parity testing | QA Engineer | todo | CPU ref covers all filter IDs and border modes |
 | ENG-004 | Create CUDA-vs-CPU correctness matrix tests | QA Engineer | todo | Matrix runs in CI with documented tolerances |
 | ENG-005 | Build reproducible benchmark harness v1 | Platform Engineer | done | `scripts/benchmark_core_cuda.py` outputs p50/p95 latency + throughput with environment metadata CSV; Linux benchmark smoke wired into CI |
-| REL-001 | Define release checklist and release gate policy | Product Lead | done | Policy/checklist established and applied to RC promotion (`release_records/RC_2026-02-25_RC1.md`); self-hosted CI evidence closure complete; remaining signatures tracked |
+| REL-001 | Define release checklist and release gate policy | Product Lead | done | Policy/checklist established and applied to RC promotion (`release_records/RC_2026-02-25_RC1.md`); self-hosted CI evidence and delegated sign-off closure complete |
 
 ## Priority 1 (Production Readiness)
 | ID | Task | Owner | Status | Acceptance Criteria |
@@ -51,7 +51,7 @@ Status values: `todo`, `in_progress`, `blocked`, `done`
 | ENG-003 | CPU reference baseline | QA Engineer | todo | Enables matrix tests |
 | ENG-006 | CI build + smoke runner validation | Platform Engineer | done | Self-hosted runs `#4` and `#5` passed on Linux/Windows CUDA jobs; fallback jobs skipped by design under `IIR2D_USE_SELF_HOSTED=true` |
 | ENG-005 | Benchmark harness v1 | Platform Engineer | done | Core C API harness implemented; sample evidence captured on 2026-02-25 (`/tmp/iir2d_core_bench_smoke.csv`) |
-| REL-001 | Release gate checklist | Product Lead | done | RC1 promoted using checklist record; CI links and self-hosted evidence backfilled; remaining audit item is role signatures |
+| REL-001 | Release gate checklist | Product Lead | done | RC1 promoted using checklist record; CI links, self-hosted evidence, and delegated role sign-offs are recorded |
 
 ## Risks and Blockers Log
 | Date | Risk | Owner | Mitigation | Status |
@@ -62,7 +62,7 @@ Status values: `todo`, `in_progress`, `blocked`, `done`
 | 2026-02-25 | Windows full smoke blocked: JAX runtime sees CPU only (`devices [CpuDevice(id=0)]`) on local host | Platform Engineer | Adopted CI policy to run Windows status-only smoke (`-SkipGpuSmoke`); keep Linux as full JAX GPU smoke gate | mitigated |
 | 2026-02-25 | Baseline commercialization metrics were not reproducibly generated from core API | Platform Engineer | Added `scripts/benchmark_core_cuda.py` harness and CI Linux benchmark smoke artifact upload | mitigated |
 | 2026-02-25 | RC promotion criteria were not formalized in repo | Product Lead | Added release gate policy/checklist and executed first formal RC pass record (`RC_2026-02-25_RC1`) | mitigated |
-| 2026-02-25 | RC1 audit closeout pending remaining human sign-offs | Product Lead | CI links/artifacts are now backfilled; collect Core/Platform/QA signatures for completeness | in_progress |
+| 2026-02-25 | RC1 audit closeout pending remaining human sign-offs | Product Lead | Resolved: delegated Core/Platform/QA sign-offs recorded per Product Lead directive (2026-02-25T07:59:01Z) | mitigated |
 | 2026-02-25 | No self-hosted CUDA runners registered in GitHub repo (`runner_count=0`) | Platform Engineer | Resolved: runners registered and runs `#4/#5` completed with self-hosted Linux/Windows jobs | mitigated |
 | TBD | Ambiguous quality claims | GTM Lead | Protocol drafted (`BENCHMARK_PROTOCOL.md`) and core harness artifacts available; pending GTM sign-off | in_progress |
 

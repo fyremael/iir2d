@@ -19,6 +19,7 @@
 2. RC1 record hard-close audit updates, including backfilled GitHub run/artifact links and CI qualification notes.
 3. CI workflow includes hosted bootstrap fallback mode gated by repo variable `IIR2D_USE_SELF_HOSTED`.
 4. RC1 CI evidence upgraded from hosted fallback to real self-hosted CUDA runs (`#4`, `#5`) on 2026-02-25 UTC.
+5. RC1 closeout checklist and sign-off tables were finalized with delegated role approvals under Product Lead directive.
 
 ## [1.0.0] - 2026-02-24
 ### Added

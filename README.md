@@ -89,7 +89,7 @@ CI:
 ```bash
 python3 -m pip install -r requirements-dev.txt
 python3 scripts/check_asset_sizes.py --max_mb 25
-python3 -m ruff check scripts/core_harness.py scripts/benchmark_core_cuda.py scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py scripts/check_perf_regression_matrix.py scripts/check_asset_sizes.py tests
+python3 -m ruff check scripts/core_harness.py scripts/benchmark_core_cuda.py scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py scripts/check_perf_regression_matrix.py scripts/check_asset_sizes.py scripts/video_demo_cuda_pipeline.py tests
 python3 -m pytest tests \
   --cov=scripts.core_harness \
   --cov=scripts.iir2d_cpu_reference \
@@ -98,6 +98,7 @@ python3 -m pytest tests \
   --cov=scripts.check_perf_regression \
   --cov=scripts.check_perf_regression_matrix \
   --cov=scripts.check_asset_sizes \
+  --cov=scripts.video_demo_cuda_pipeline \
   --cov-report=term-missing \
   --cov-fail-under=85
 ```
@@ -172,6 +173,28 @@ python3 -m http.server 8080
 ```
 
 Tracked showcase image assets are policy-gated at `<=25 MiB` per file (`scripts/check_asset_sizes.py`).
+
+## Video Demo (CUDA C API)
+Run decode -> CUDA IIR2D (per RGB channel) -> encode:
+
+```bash
+python3 scripts/video_demo_cuda_pipeline.py \
+  --in_video /path/to/input.mp4 \
+  --out_video /path/to/output.mp4 \
+  --filter_id 4 \
+  --border_mode mirror \
+  --precision f32 \
+  --temporal_ema_alpha 0.9 \
+  --codec libx264 \
+  --preset medium \
+  --crf 18
+```
+
+Notes:
+1. Requires `ffmpeg` + `ffprobe` on `PATH`.
+2. `--temporal_ema_alpha 1.0` disables temporal smoothing.
+3. For smoke runs, set `--max_frames` (for example `--max_frames 120`).
+4. For NVIDIA encoder output, set `--codec h264_nvenc`.
 
 ## Usage
 

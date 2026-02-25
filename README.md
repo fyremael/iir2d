@@ -68,12 +68,13 @@ Prerequisites:
 3. Python (`python3` on Linux/WSL, `python` on Windows)
 
 CI:
-1. `.github/workflows/cuda-cross-platform.yml` requires self-hosted CUDA mode (`IIR2D_USE_SELF_HOSTED=true`) on push/PR.
+1. `.github/workflows/cuda-cross-platform.yml` enforces self-hosted CUDA mode on protected push paths (`IIR2D_USE_SELF_HOSTED=true`), with hosted contributor fallback when unavailable.
 2. CI policy:
    1. Linux job runs full smoke (`scripts/build_and_smoke_wsl.sh`).
    2. Linux job runs CUDA-vs-CPU parity matrix over filter IDs `1..8`.
-   3. Linux job runs real GPU video E2E smoke (decode -> CUDA IIR2D -> encode) and uploads video benchmark artifacts.
+   3. Linux job runs multi-case GPU video E2E smoke (decode -> CUDA IIR2D -> encode), then computes PSNR/SSIM/temporal quality metrics.
    4. Windows job runs status-only smoke (`scripts/build_and_smoke_windows.ps1 -SkipGpuSmoke`).
+   5. Hosted fallback runs lint + unit tests for contributor feedback loops.
 3. Required runner labels:
    1. Linux: `self-hosted`, `linux`, `x64`, `gpu`, `cuda`
    2. Windows: `self-hosted`, `windows`, `x64`, `gpu`, `cuda`
@@ -82,15 +83,15 @@ CI:
    1. `.github/workflows/nightly-perf-regression.yml`
    2. Runs CUDA-vs-CPU parity matrix over filter IDs `1..8` before benchmarking.
    3. Generates an all-8-filter benchmark matrix artifact (`/tmp/iir2d_core_bench_nightly_all8.csv`).
-   4. Runs baseline-compatible protocol subset (`filter_ids=1,4,8`) for regression checks against `release_records/artifacts/benchmark_baselines/core_protocol_v1.csv`.
-   5. Uploads all benchmark CSV artifacts and markdown trend report.
+   4. Runs regression checks against full baseline `release_records/artifacts/benchmark_baselines/core_protocol_v2_all8.csv`.
+   5. Uploads benchmark CSV and markdown trend report artifacts.
 6. Python quality gates:
    1. `.github/workflows/quality-gates.yml` runs ruff lint + pytest coverage on core harness modules.
    2. Local run:
 ```bash
 python3 -m pip install -r requirements-dev.txt
 python3 scripts/check_asset_sizes.py --max_mb 25
-python3 -m ruff check scripts/core_harness.py scripts/benchmark_core_cuda.py scripts/benchmark_video_cuda_pipeline.py scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py scripts/check_perf_regression_matrix.py scripts/check_asset_sizes.py scripts/video_demo_cuda_pipeline.py tests
+python3 -m ruff check scripts/core_harness.py scripts/benchmark_core_cuda.py scripts/benchmark_video_cuda_pipeline.py scripts/video_quality_metrics.py scripts/build_video_report_pack.py scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py scripts/check_perf_regression_matrix.py scripts/check_asset_sizes.py scripts/video_demo_cuda_pipeline.py iir2d_video tests
 python3 -m pytest tests \
   --cov=scripts.core_harness \
   --cov=scripts.iir2d_cpu_reference \
@@ -111,7 +112,7 @@ Use the C API benchmark harness to produce reproducible p50/p95 latency and thro
 ```bash
 python3 scripts/benchmark_core_cuda.py \
   --sizes 512x512,1024x1024,2048x2048 \
-  --filter_ids 1,4,8 \
+  --filter_ids 1,2,3,4,5,6,7,8 \
   --border_modes mirror \
   --precisions f32,mixed \
   --warmup 10 \
@@ -133,14 +134,14 @@ Build a publishable claims packet from a benchmark CSV:
 python3 scripts/build_benchmark_claims_packet.py \
   --in_csv /tmp/iir2d_core_bench.csv \
   --out_md /tmp/iir2d_claims_packet.md \
-  --benchmark_command "python3 scripts/benchmark_core_cuda.py --sizes 512x512,1024x1024,2048x2048 --filter_ids 1,4,8 --border_modes mirror --precisions f32,mixed --warmup 10 --iters 50 --out_csv /tmp/iir2d_core_bench.csv"
+  --benchmark_command "python3 scripts/benchmark_core_cuda.py --sizes 512x512,1024x1024,2048x2048 --filter_ids 1,2,3,4,5,6,7,8 --border_modes mirror --precisions f32,mixed --warmup 10 --iters 50 --out_csv /tmp/iir2d_core_bench.csv"
 ```
 
 Nightly full-matrix trend check (same workload matrix):
 ```bash
 python3 scripts/check_perf_regression_matrix.py \
   --current_csv /tmp/iir2d_core_bench.csv \
-  --baseline_csv release_records/artifacts/benchmark_baselines/core_protocol_v1.csv \
+  --baseline_csv release_records/artifacts/benchmark_baselines/core_protocol_v2_all8.csv \
   --metric latency_ms_p50 \
   --direction lower_is_better \
   --max_regression_pct 25.0 \
@@ -178,16 +179,18 @@ Tracked showcase image assets are policy-gated at `<=25 MiB` per file (`scripts/
 Committed sample video artifacts for showcase/demo live under `visual_showcase/assets/video_demo/`.
 
 ## Video Demo (CUDA C API)
-Run decode -> CUDA IIR2D (per RGB channel) -> encode:
+Run decode -> CUDA IIR2D -> encode (default tuned for natural video: luma filtering + adaptive temporal blend):
 
 ```bash
 python3 scripts/video_demo_cuda_pipeline.py \
   --in_video /path/to/input.mp4 \
   --out_video /path/to/output.mp4 \
-  --filter_id 4 \
+  --filter_id 1 \
   --border_mode mirror \
   --precision f32 \
-  --temporal_ema_alpha 0.9 \
+  --color_mode luma \
+  --strength 0.65 \
+  --temporal_mode adaptive \
   --codec libx264 \
   --preset medium \
   --crf 18
@@ -195,7 +198,7 @@ python3 scripts/video_demo_cuda_pipeline.py \
 
 Notes:
 1. Requires `ffmpeg` + `ffprobe` on `PATH`.
-2. `--temporal_ema_alpha 1.0` disables temporal smoothing.
+2. For strict fixed-mode temporal behavior, use `--temporal_mode fixed --temporal_ema_alpha 1.0` to disable temporal smoothing.
 3. For smoke runs, set `--max_frames` (for example `--max_frames 120`).
 4. For NVIDIA encoder output, set `--codec h264_nvenc`.
 
@@ -205,9 +208,12 @@ Benchmark decode -> CUDA IIR2D -> encode throughput:
 python3 scripts/benchmark_video_cuda_pipeline.py \
   --in_video /path/to/input.mp4 \
   --out_csv /tmp/iir2d_video_bench.csv \
-  --filter_id 4 \
+  --filter_id 1 \
   --border_mode mirror \
   --precision f32 \
+  --color_mode luma \
+  --strength 0.65 \
+  --temporal_mode adaptive \
   --mode full \
   --codec libx264 \
   --encode_sink null \
@@ -219,6 +225,45 @@ Key outputs in CSV:
 1. Per-frame loop latency (`loop_ms_p50`, `loop_ms_p95`).
 2. Stage means (`decode_ms_mean`, `process_ms_mean`, `encode_ms_mean`).
 3. Throughput (`timed_fps`, `timed_mpix_per_s`).
+
+Objective video quality metrics (PSNR/SSIM/temporal motion delta):
+
+```bash
+python3 scripts/video_quality_metrics.py \
+  --reference_video /path/to/input.mp4 \
+  --test_video /path/to/output.mp4 \
+  --out_csv /tmp/iir2d_video_quality.csv \
+  --min_psnr_mean 15.0 \
+  --min_ssim_mean 0.35 \
+  --max_temporal_delta_mean 0.08
+```
+
+Python API wrappers (typed configs):
+
+```python
+from iir2d_video import (
+    VideoBenchmarkConfig,
+    VideoProcessConfig,
+    VideoQualityConfig,
+    benchmark_video,
+    evaluate_video_quality,
+    process_video,
+)
+
+process_video(VideoProcessConfig(in_video="input.mp4", out_video="output.mp4"))
+benchmark_video(VideoBenchmarkConfig(in_video="input.mp4", out_csv="bench.csv"))
+evaluate_video_quality(VideoQualityConfig(reference_video="input.mp4", test_video="output.mp4", out_csv="quality.csv"))
+```
+
+Build a partner-ready markdown report pack from generated artifacts:
+
+```bash
+python3 scripts/build_video_report_pack.py \
+  --benchmark_csvs /tmp/iir2d_video_bench.csv \
+  --quality_csvs /tmp/iir2d_video_quality.csv \
+  --clips visual_showcase/assets/video_demo/compare_portrait_original_f1_f4_f8.mp4,visual_showcase/assets/video_demo/output_portrait_zoom_iir2d_f1_natural.mp4 \
+  --out_md /tmp/iir2d_video_report_pack.md
+```
 
 ## Usage
 

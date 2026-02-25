@@ -46,7 +46,7 @@ jobs:
       - name: Ruff lint
         shell: bash
         run: |
-          python -m ruff check scripts/core_harness.py scripts/benchmark_core_cuda.py scripts/benchmark_video_cuda_pipeline.py scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py scripts/check_perf_regression_matrix.py scripts/check_asset_sizes.py scripts/video_demo_cuda_pipeline.py tests
+          python -m ruff check scripts/core_harness.py scripts/benchmark_core_cuda.py scripts/benchmark_video_cuda_pipeline.py scripts/video_quality_metrics.py scripts/build_video_report_pack.py scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py scripts/check_perf_regression_matrix.py scripts/check_asset_sizes.py scripts/video_demo_cuda_pipeline.py iir2d_video tests
 
       - name: Unit tests with coverage
         shell: bash

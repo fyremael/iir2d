@@ -20,19 +20,18 @@ on:
 
 jobs:
   enforce_self_hosted_cuda_policy:
+    if: ${{ github.event_name == 'push' && vars.IIR2D_USE_SELF_HOSTED != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Require self-hosted CUDA mode
         shell: bash
         run: |
-          if [ "${{ vars.IIR2D_USE_SELF_HOSTED }}" != "true" ]; then
-            echo "IIR2D_USE_SELF_HOSTED must be set to true for this workflow."
-            echo "CUDA parity and GPU E2E smoke are required on every push/PR."
-            exit 1
-          fi
+          echo "IIR2D_USE_SELF_HOSTED must be true on protected push paths."
+          echo "Hosted contributor fallback remains available on PR/non-GPU runs."
+          exit 1
 
   linux_cuda_build_smoke:
-    needs: enforce_self_hosted_cuda_policy
+    if: ${{ vars.IIR2D_USE_SELF_HOSTED == 'true' }}
     runs-on: [self-hosted, linux, x64, gpu, cuda]
     steps:
       - name: Checkout
@@ -72,23 +71,56 @@ jobs:
           command -v ffmpeg >/dev/null 2>&1 || { echo "ffmpeg missing from PATH"; exit 1; }
           command -v ffprobe >/dev/null 2>&1 || { echo "ffprobe missing from PATH"; exit 1; }
 
+          # Case A: 640x360@30, natural profile, F1
           ffmpeg -hide_banner -loglevel error -y \
             -f lavfi -i "testsrc2=duration=4:size=640x360:rate=30" \
-            -c:v libx264 -pix_fmt yuv420p /tmp/iir2d_video_smoke_input.mp4
+            -c:v libx264 -pix_fmt yuv420p /tmp/iir2d_video_smoke_input_a.mp4
 
           python3 scripts/video_demo_cuda_pipeline.py \
-            --in_video /tmp/iir2d_video_smoke_input.mp4 \
-            --out_video /tmp/iir2d_video_smoke_output.mp4 \
-            --filter_id 4 \
+            --in_video /tmp/iir2d_video_smoke_input_a.mp4 \
+            --out_video /tmp/iir2d_video_smoke_output_a.mp4 \
+            --filter_id 1 \
             --border_mode mirror \
             --precision f32 \
-            --temporal_ema_alpha 0.95 \
             --codec libx264 \
             --preset medium \
             --crf 18
 
+          python3 scripts/video_quality_metrics.py \
+            --reference_video /tmp/iir2d_video_smoke_input_a.mp4 \
+            --test_video /tmp/iir2d_video_smoke_output_a.mp4 \
+            --out_csv /tmp/iir2d_video_quality_smoke_a.csv \
+            --min_psnr_mean 15.0 \
+            --min_ssim_mean 0.35 \
+            --max_temporal_delta_mean 0.08
+
+          # Case B: odd FPS, stronger filter, frame-capped benchmark
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i "testsrc2=duration=5:size=854x480:rate=30000/1001" \
+            -c:v libx264 -pix_fmt yuv420p /tmp/iir2d_video_smoke_input_b.mp4
+
+          python3 scripts/video_demo_cuda_pipeline.py \
+            --in_video /tmp/iir2d_video_smoke_input_b.mp4 \
+            --out_video /tmp/iir2d_video_smoke_output_b.mp4 \
+            --filter_id 4 \
+            --border_mode mirror \
+            --precision f32 \
+            --codec libx264 \
+            --preset medium \
+            --crf 18 \
+            --max_frames 120
+
+          python3 scripts/video_quality_metrics.py \
+            --reference_video /tmp/iir2d_video_smoke_input_b.mp4 \
+            --test_video /tmp/iir2d_video_smoke_output_b.mp4 \
+            --out_csv /tmp/iir2d_video_quality_smoke_b.csv \
+            --max_frames 120 \
+            --min_psnr_mean 13.0 \
+            --min_ssim_mean 0.30 \
+            --max_temporal_delta_mean 0.10
+
           python3 scripts/benchmark_video_cuda_pipeline.py \
-            --in_video /tmp/iir2d_video_smoke_input.mp4 \
+            --in_video /tmp/iir2d_video_smoke_input_b.mp4 \
             --out_csv /tmp/iir2d_video_bench_smoke.csv \
             --filter_id 4 \
             --border_mode mirror \
@@ -111,12 +143,16 @@ jobs:
         with:
           name: linux-video-benchmark-smoke
           path: |
-            /tmp/iir2d_video_smoke_input.mp4
-            /tmp/iir2d_video_smoke_output.mp4
+            /tmp/iir2d_video_smoke_input_a.mp4
+            /tmp/iir2d_video_smoke_output_a.mp4
+            /tmp/iir2d_video_quality_smoke_a.csv
+            /tmp/iir2d_video_smoke_input_b.mp4
+            /tmp/iir2d_video_smoke_output_b.mp4
+            /tmp/iir2d_video_quality_smoke_b.csv
             /tmp/iir2d_video_bench_smoke.csv
 
   windows_cuda_build_smoke:
-    needs: enforce_self_hosted_cuda_policy
+    if: ${{ vars.IIR2D_USE_SELF_HOSTED == 'true' }}
     runs-on: [self-hosted, windows, x64, gpu, cuda]
     steps:
       - name: Checkout
@@ -126,3 +162,28 @@ jobs:
         shell: pwsh
         run: |
           powershell -ExecutionPolicy Bypass -File .\scripts\build_and_smoke_windows.ps1 -SkipGpuSmoke
+
+  hosted_contributor_validation:
+    if: ${{ vars.IIR2D_USE_SELF_HOSTED != 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dev dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+
+      - name: Hosted contributor quality pass
+        shell: bash
+        run: |
+          python scripts/check_asset_sizes.py --max_mb 25
+          python -m ruff check scripts/core_harness.py scripts/benchmark_core_cuda.py scripts/benchmark_video_cuda_pipeline.py scripts/video_quality_metrics.py scripts/build_video_report_pack.py scripts/iir2d_cpu_reference.py scripts/validate_cuda_cpu_matrix.py scripts/build_benchmark_claims_packet.py scripts/check_perf_regression.py scripts/check_perf_regression_matrix.py scripts/check_asset_sizes.py scripts/video_demo_cuda_pipeline.py iir2d_video tests
+          python -m pytest tests

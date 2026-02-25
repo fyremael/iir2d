@@ -14,10 +14,24 @@ import numpy as np
 
 if __package__:
     from .core_harness import BORDER_MAP, PRECISION_MAP
-    from .video_demo_cuda_pipeline import CudaFrameFilter, VideoSpec, apply_temporal_ema, probe_video
+    from .video_demo_cuda_pipeline import (
+        CudaFrameFilter,
+        VideoSpec,
+        apply_temporal_ema,
+        filter_frame,
+        probe_video,
+        resolve_temporal_alpha,
+    )
 else:
     from core_harness import BORDER_MAP, PRECISION_MAP
-    from video_demo_cuda_pipeline import CudaFrameFilter, VideoSpec, apply_temporal_ema, probe_video
+    from video_demo_cuda_pipeline import (
+        CudaFrameFilter,
+        VideoSpec,
+        apply_temporal_ema,
+        filter_frame,
+        probe_video,
+        resolve_temporal_alpha,
+    )
 
 
 def summarize_ms(samples: list[float]) -> dict[str, float]:
@@ -127,7 +141,13 @@ def make_row(
         "filter_id": args.filter_id,
         "border_mode": args.border_mode,
         "precision": args.precision,
+        "color_mode": args.color_mode,
+        "strength": float(args.strength),
+        "temporal_mode": args.temporal_mode,
         "temporal_ema_alpha": float(args.temporal_ema_alpha),
+        "temporal_alpha_min": float(args.temporal_alpha_min),
+        "temporal_alpha_max": float(args.temporal_alpha_max),
+        "temporal_motion_threshold": float(args.temporal_motion_threshold),
         "mode": args.mode,
         "codec": args.codec,
         "preset": args.preset,
@@ -170,8 +190,22 @@ def run_benchmark(args: argparse.Namespace) -> int:
         raise FileNotFoundError(f"Input video not found: {in_video}")
     if args.filter_id < 1 or args.filter_id > 8:
         raise ValueError(f"Invalid --filter_id {args.filter_id}; expected 1..8")
+    if args.color_mode not in ("rgb", "luma"):
+        raise ValueError("Expected --color_mode in {'rgb','luma'}.")
+    if args.strength < 0.0 or args.strength > 1.0:
+        raise ValueError("Expected --strength in [0,1].")
+    if args.temporal_mode not in ("fixed", "adaptive"):
+        raise ValueError("Expected --temporal_mode in {'fixed','adaptive'}.")
     if args.temporal_ema_alpha <= 0.0 or args.temporal_ema_alpha > 1.0:
         raise ValueError("Expected --temporal_ema_alpha in (0, 1].")
+    if args.temporal_alpha_min <= 0.0 or args.temporal_alpha_min > 1.0:
+        raise ValueError("Expected --temporal_alpha_min in (0, 1].")
+    if args.temporal_alpha_max <= 0.0 or args.temporal_alpha_max > 1.0:
+        raise ValueError("Expected --temporal_alpha_max in (0, 1].")
+    if args.temporal_alpha_min > args.temporal_alpha_max:
+        raise ValueError("Expected --temporal_alpha_min <= --temporal_alpha_max.")
+    if args.temporal_motion_threshold <= 0.0:
+        raise ValueError("Expected --temporal_motion_threshold > 0.")
     if args.warmup_frames < 0 or args.timed_frames <= 0:
         raise ValueError("Expected --warmup_frames >= 0 and --timed_frames > 0.")
     if args.mode == "filter_only" and args.encode_sink == "file":
@@ -236,9 +270,17 @@ def run_benchmark(args: argparse.Namespace) -> int:
                 frame_u8 = np.frombuffer(blob, dtype=np.uint8).reshape((spec.height, spec.width, 3))
                 process_t0 = time.perf_counter()
                 x = frame_u8.astype(np.float32) / 255.0
-                channels = [runner.forward_gray(x[:, :, c]) for c in range(3)]
-                filtered = np.stack(channels, axis=2).astype(np.float32)
-                smoothed = apply_temporal_ema(filtered, ema_prev, args.temporal_ema_alpha)
+                filtered = filter_frame(runner, x, color_mode=args.color_mode, strength=args.strength)
+                alpha = resolve_temporal_alpha(
+                    current=filtered,
+                    previous=ema_prev,
+                    temporal_mode=args.temporal_mode,
+                    temporal_ema_alpha=args.temporal_ema_alpha,
+                    temporal_alpha_min=args.temporal_alpha_min,
+                    temporal_alpha_max=args.temporal_alpha_max,
+                    temporal_motion_threshold=args.temporal_motion_threshold,
+                )
+                smoothed = apply_temporal_ema(filtered, ema_prev, alpha)
                 ema_prev = smoothed
                 out_u8 = np.clip(np.rint(smoothed * 255.0), 0, 255).astype(np.uint8)
                 process_t1 = time.perf_counter()
@@ -318,7 +360,13 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--border_mode", default="mirror", choices=sorted(BORDER_MAP))
     ap.add_argument("--border_const", type=float, default=0.0)
     ap.add_argument("--precision", default="f32", choices=sorted(PRECISION_MAP))
-    ap.add_argument("--temporal_ema_alpha", type=float, default=1.0)
+    ap.add_argument("--color_mode", default="luma", choices=["luma", "rgb"])
+    ap.add_argument("--strength", type=float, default=0.65)
+    ap.add_argument("--temporal_mode", default="adaptive", choices=["adaptive", "fixed"])
+    ap.add_argument("--temporal_ema_alpha", type=float, default=0.9)
+    ap.add_argument("--temporal_alpha_min", type=float, default=0.10)
+    ap.add_argument("--temporal_alpha_max", type=float, default=0.95)
+    ap.add_argument("--temporal_motion_threshold", type=float, default=0.08)
     ap.add_argument("--mode", default="full", choices=["full", "filter_only"])
     ap.add_argument("--ffmpeg", default="ffmpeg")
     ap.add_argument("--ffprobe", default="ffprobe")

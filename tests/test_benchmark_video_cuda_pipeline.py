@@ -97,7 +97,13 @@ def _make_args(work_dir: Path, **overrides) -> argparse.Namespace:
         "border_mode": "mirror",
         "border_const": 0.0,
         "precision": "f32",
+        "color_mode": "rgb",
+        "strength": 1.0,
+        "temporal_mode": "fixed",
         "temporal_ema_alpha": 1.0,
+        "temporal_alpha_min": 0.1,
+        "temporal_alpha_max": 0.95,
+        "temporal_motion_threshold": 0.08,
         "mode": "full",
         "ffmpeg": "ffmpeg",
         "ffprobe": "ffprobe",
@@ -191,6 +197,7 @@ def test_run_benchmark_filter_only_path(monkeypatch: pytest.MonkeyPatch) -> None
             row = next(csv.DictReader(f))
         assert int(row["timed_frames"]) == 2
         assert float(row["encode_ms_mean"]) == pytest.approx(0.0)
+        assert row["color_mode"] == "rgb"
 
 
 def test_run_benchmark_full_mode_stops_early_without_decode_failure(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -225,3 +232,11 @@ def test_run_benchmark_raises_when_not_enough_frames(monkeypatch: pytest.MonkeyP
 
         with pytest.raises(RuntimeError, match="No timed frames"):
             bench_video.run_benchmark(_make_args(work_dir, mode="filter_only", timed_frames=2))
+
+
+def test_run_benchmark_validates_strength(monkeypatch: pytest.MonkeyPatch) -> None:
+    with tempfile.TemporaryDirectory(dir=Path(__file__).resolve().parents[1]) as td:
+        work_dir = Path(td)
+        (work_dir / "in.mp4").write_bytes(b"stub")
+        with pytest.raises(ValueError, match="--strength"):
+            bench_video.run_benchmark(_make_args(work_dir, strength=1.3))

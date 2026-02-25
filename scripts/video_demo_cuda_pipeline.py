@@ -39,6 +39,10 @@ else:
         load_core_library,
     )
 
+KR_BT709 = np.float32(0.2126)
+KG_BT709 = np.float32(0.7152)
+KB_BT709 = np.float32(0.0722)
+
 
 @dataclass(frozen=True)
 class VideoSpec:
@@ -129,11 +133,72 @@ def build_encode_command(
 def apply_temporal_ema(
     current: np.ndarray,
     previous: np.ndarray | None,
-    alpha: float,
+    alpha: float | np.ndarray,
 ) -> np.ndarray:
     if previous is None:
         return current
     return (alpha * current) + ((1.0 - alpha) * previous)
+
+
+def rgb_to_ycbcr_bt709(frame_rgb: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    r = frame_rgb[:, :, 0]
+    g = frame_rgb[:, :, 1]
+    b = frame_rgb[:, :, 2]
+    y = KR_BT709 * r + KG_BT709 * g + KB_BT709 * b
+    cb = ((b - y) / (2.0 * (1.0 - KB_BT709))) + 0.5
+    cr = ((r - y) / (2.0 * (1.0 - KR_BT709))) + 0.5
+    return y.astype(np.float32), cb.astype(np.float32), cr.astype(np.float32)
+
+
+def ycbcr_to_rgb_bt709(y: np.ndarray, cb: np.ndarray, cr: np.ndarray) -> np.ndarray:
+    cbm = cb - 0.5
+    crm = cr - 0.5
+    r = y + (2.0 * (1.0 - KR_BT709)) * crm
+    b = y + (2.0 * (1.0 - KB_BT709)) * cbm
+    g = (y - KR_BT709 * r - KB_BT709 * b) / KG_BT709
+    return np.stack([r, g, b], axis=2).astype(np.float32)
+
+
+def resolve_temporal_alpha(
+    current: np.ndarray,
+    previous: np.ndarray | None,
+    temporal_mode: str,
+    temporal_ema_alpha: float,
+    temporal_alpha_min: float,
+    temporal_alpha_max: float,
+    temporal_motion_threshold: float,
+) -> float | np.ndarray:
+    if previous is None:
+        return 1.0
+    if temporal_mode == "fixed":
+        return float(temporal_ema_alpha)
+
+    motion = np.mean(np.abs(current - previous), axis=2, keepdims=True)
+    scaled = np.clip(motion / temporal_motion_threshold, 0.0, 1.0)
+    alpha = temporal_alpha_min + (temporal_alpha_max - temporal_alpha_min) * scaled
+    return alpha.astype(np.float32)
+
+
+def filter_frame(
+    runner: CudaFrameFilter,
+    frame_rgb: np.ndarray,
+    color_mode: str,
+    strength: float,
+) -> np.ndarray:
+    if color_mode == "rgb":
+        channels: list[np.ndarray] = []
+        for c in range(3):
+            channels.append(runner.forward_gray(frame_rgb[:, :, c]))
+        filtered = np.stack(channels, axis=2).astype(np.float32)
+        return ((strength * filtered) + ((1.0 - strength) * frame_rgb)).astype(np.float32)
+
+    if color_mode == "luma":
+        y, cb, cr = rgb_to_ycbcr_bt709(frame_rgb)
+        y_filtered = runner.forward_gray(y)
+        y_out = (strength * y_filtered) + ((1.0 - strength) * y)
+        return ycbcr_to_rgb_bt709(y_out.astype(np.float32), cb, cr)
+
+    raise ValueError(f"Invalid color_mode {color_mode!r}; expected one of ['luma', 'rgb']")
 
 
 class CudaFrameFilter:
@@ -241,8 +306,22 @@ def run_pipeline(args: argparse.Namespace) -> int:
         raise ValueError(f"Invalid --border_mode {args.border_mode!r}; expected one of {sorted(BORDER_MAP)}")
     if args.precision not in PRECISION_MAP:
         raise ValueError(f"Invalid --precision {args.precision!r}; expected one of {sorted(PRECISION_MAP)}")
+    if args.color_mode not in ("rgb", "luma"):
+        raise ValueError("Expected --color_mode in {'rgb','luma'}.")
+    if args.strength < 0.0 or args.strength > 1.0:
+        raise ValueError("Expected --strength in [0, 1].")
+    if args.temporal_mode not in ("fixed", "adaptive"):
+        raise ValueError("Expected --temporal_mode in {'fixed','adaptive'}.")
     if args.temporal_ema_alpha <= 0.0 or args.temporal_ema_alpha > 1.0:
         raise ValueError("Expected --temporal_ema_alpha in (0, 1].")
+    if args.temporal_alpha_min <= 0.0 or args.temporal_alpha_min > 1.0:
+        raise ValueError("Expected --temporal_alpha_min in (0, 1].")
+    if args.temporal_alpha_max <= 0.0 or args.temporal_alpha_max > 1.0:
+        raise ValueError("Expected --temporal_alpha_max in (0, 1].")
+    if args.temporal_alpha_min > args.temporal_alpha_max:
+        raise ValueError("Expected --temporal_alpha_min <= --temporal_alpha_max.")
+    if args.temporal_motion_threshold <= 0.0:
+        raise ValueError("Expected --temporal_motion_threshold > 0.")
     if args.max_frames < 0:
         raise ValueError("Expected --max_frames >= 0.")
 
@@ -298,11 +377,17 @@ def run_pipeline(args: argparse.Namespace) -> int:
                     raise RuntimeError("Incomplete frame payload from decoder.")
                 frame_u8 = np.frombuffer(blob, dtype=np.uint8).reshape((spec.height, spec.width, 3))
                 x = frame_u8.astype(np.float32) / 255.0
-                channels: list[np.ndarray] = []
-                for c in range(3):
-                    channels.append(runner.forward_gray(x[:, :, c]))
-                filtered = np.stack(channels, axis=2).astype(np.float32)
-                smoothed = apply_temporal_ema(filtered, ema_prev, args.temporal_ema_alpha)
+                filtered = filter_frame(runner, x, color_mode=args.color_mode, strength=args.strength)
+                alpha = resolve_temporal_alpha(
+                    current=filtered,
+                    previous=ema_prev,
+                    temporal_mode=args.temporal_mode,
+                    temporal_ema_alpha=args.temporal_ema_alpha,
+                    temporal_alpha_min=args.temporal_alpha_min,
+                    temporal_alpha_max=args.temporal_alpha_max,
+                    temporal_motion_threshold=args.temporal_motion_threshold,
+                )
+                smoothed = apply_temporal_ema(filtered, ema_prev, alpha)
                 ema_prev = smoothed
                 out_u8 = np.clip(np.rint(smoothed * 255.0), 0, 255).astype(np.uint8)
                 encode_proc.stdin.write(out_u8.tobytes())
@@ -334,7 +419,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
     print(
         f"Done: frames={processed} "
         f"filter=f{args.filter_id} border={args.border_mode} precision={args.precision} "
-        f"temporal_ema_alpha={args.temporal_ema_alpha:.3f} out={out_video}"
+        f"color={args.color_mode} strength={args.strength:.2f} "
+        f"temporal_mode={args.temporal_mode} out={out_video}"
     )
     return 0
 
@@ -347,11 +433,37 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--border_mode", default="mirror", choices=sorted(BORDER_MAP))
     ap.add_argument("--border_const", type=float, default=0.0)
     ap.add_argument("--precision", default="f32", choices=sorted(PRECISION_MAP))
+    ap.add_argument("--color_mode", default="luma", choices=["luma", "rgb"])
+    ap.add_argument(
+        "--strength",
+        type=float,
+        default=0.65,
+        help="Blend strength between filtered and original frame in [0,1].",
+    )
+    ap.add_argument("--temporal_mode", default="adaptive", choices=["adaptive", "fixed"])
     ap.add_argument(
         "--temporal_ema_alpha",
         type=float,
-        default=1.0,
-        help="Temporal EMA blend alpha in (0,1], where 1.0 disables temporal smoothing.",
+        default=0.9,
+        help="Temporal EMA alpha in fixed mode, in (0,1].",
+    )
+    ap.add_argument(
+        "--temporal_alpha_min",
+        type=float,
+        default=0.10,
+        help="Minimum alpha in adaptive temporal mode.",
+    )
+    ap.add_argument(
+        "--temporal_alpha_max",
+        type=float,
+        default=0.95,
+        help="Maximum alpha in adaptive temporal mode.",
+    )
+    ap.add_argument(
+        "--temporal_motion_threshold",
+        type=float,
+        default=0.08,
+        help="Motion threshold for adaptive temporal alpha mapping.",
     )
     ap.add_argument("--ffmpeg", default="ffmpeg")
     ap.add_argument("--ffprobe", default="ffprobe")

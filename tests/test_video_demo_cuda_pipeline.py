@@ -60,11 +60,72 @@ def test_apply_temporal_ema_first_frame() -> None:
     np.testing.assert_allclose(out, current)
 
 
-def test_apply_temporal_ema_blend() -> None:
-    current = np.array([[1.0, 0.0]], dtype=np.float32)
-    previous = np.array([[0.0, 1.0]], dtype=np.float32)
-    out = video_demo.apply_temporal_ema(current, previous=previous, alpha=0.25)
-    np.testing.assert_allclose(out, np.array([[0.25, 0.75]], dtype=np.float32))
+def test_apply_temporal_ema_blend_scalar_and_map_alpha() -> None:
+    current = np.array([[[1.0, 0.0, 0.0]]], dtype=np.float32)
+    previous = np.array([[[0.0, 1.0, 0.0]]], dtype=np.float32)
+    out_scalar = video_demo.apply_temporal_ema(current, previous=previous, alpha=0.25)
+    np.testing.assert_allclose(out_scalar, np.array([[[0.25, 0.75, 0.0]]], dtype=np.float32))
+
+    alpha_map = np.array([[[0.5]]], dtype=np.float32)
+    out_map = video_demo.apply_temporal_ema(current, previous=previous, alpha=alpha_map)
+    np.testing.assert_allclose(out_map, np.array([[[0.5, 0.5, 0.0]]], dtype=np.float32))
+
+
+def test_rgb_ycbcr_roundtrip() -> None:
+    rgb = np.array(
+        [
+            [[0.1, 0.2, 0.3], [0.9, 0.5, 0.2]],
+            [[0.8, 0.1, 0.7], [0.3, 0.9, 0.6]],
+        ],
+        dtype=np.float32,
+    )
+    y, cb, cr = video_demo.rgb_to_ycbcr_bt709(rgb)
+    recon = video_demo.ycbcr_to_rgb_bt709(y, cb, cr)
+    np.testing.assert_allclose(recon, rgb, atol=3e-6, rtol=0.0)
+
+
+def test_resolve_temporal_alpha_modes() -> None:
+    current = np.array([[[0.8, 0.8, 0.8]]], dtype=np.float32)
+    prev = np.array([[[0.2, 0.2, 0.2]]], dtype=np.float32)
+    fixed = video_demo.resolve_temporal_alpha(
+        current=current,
+        previous=prev,
+        temporal_mode="fixed",
+        temporal_ema_alpha=0.33,
+        temporal_alpha_min=0.1,
+        temporal_alpha_max=0.9,
+        temporal_motion_threshold=0.1,
+    )
+    assert fixed == pytest.approx(0.33)
+
+    adaptive = video_demo.resolve_temporal_alpha(
+        current=current,
+        previous=prev,
+        temporal_mode="adaptive",
+        temporal_ema_alpha=0.33,
+        temporal_alpha_min=0.1,
+        temporal_alpha_max=0.9,
+        temporal_motion_threshold=0.2,
+    )
+    assert isinstance(adaptive, np.ndarray)
+    assert adaptive.shape == (1, 1, 1)
+    assert float(adaptive[0, 0, 0]) == pytest.approx(0.9)
+
+
+class _IdentityRunner:
+    def forward_gray(self, frame_gray: np.ndarray) -> np.ndarray:
+        return frame_gray
+
+
+def test_filter_frame_modes() -> None:
+    frame = np.array([[[0.25, 0.5, 0.75]]], dtype=np.float32)
+    identity = _IdentityRunner()
+
+    rgb_out = video_demo.filter_frame(identity, frame, color_mode="rgb", strength=1.0)
+    np.testing.assert_allclose(rgb_out, frame, atol=0.0, rtol=0.0)
+
+    luma_out = video_demo.filter_frame(identity, frame, color_mode="luma", strength=1.0)
+    np.testing.assert_allclose(luma_out, frame, atol=3e-6, rtol=0.0)
 
 
 def test_probe_video_parses_stream(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -178,7 +239,13 @@ def _make_args(work_dir: Path, **overrides) -> argparse.Namespace:
         "border_mode": "mirror",
         "border_const": 0.0,
         "precision": "f32",
+        "color_mode": "rgb",
+        "strength": 1.0,
+        "temporal_mode": "fixed",
         "temporal_ema_alpha": 1.0,
+        "temporal_alpha_min": 0.1,
+        "temporal_alpha_max": 0.95,
+        "temporal_motion_threshold": 0.08,
         "ffmpeg": "ffmpeg",
         "ffprobe": "ffprobe",
         "codec": "libx264",
@@ -251,3 +318,11 @@ def test_run_pipeline_raises_on_decode_error_without_frame_cap(monkeypatch: pyte
 
         with pytest.raises(RuntimeError, match="Decode process failed"):
             video_demo.run_pipeline(_make_args(work_dir))
+
+
+def test_run_pipeline_validates_strength(monkeypatch: pytest.MonkeyPatch) -> None:
+    with tempfile.TemporaryDirectory(dir=Path(__file__).resolve().parents[1]) as td:
+        work_dir = Path(td)
+        (work_dir / "in.mp4").write_bytes(b"stub")
+        with pytest.raises(ValueError, match="--strength"):
+            video_demo.run_pipeline(_make_args(work_dir, strength=1.2))

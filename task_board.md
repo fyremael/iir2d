@@ -20,7 +20,7 @@ Status values: `in_progress`, `blocked`, `done`
 | ENG-008 | Linux binary packaging and install docs | Platform Engineer | done | Linux packaging/install guide published in `PACKAGING_LINUX.md` with one-command consume path |
 | ENG-009 | Windows binary packaging and install docs | Platform Engineer | done | Windows packaging/install guide published in `PACKAGING_WINDOWS.md` with one-command consume path |
 | ENG-010 | Compatibility matrix (CUDA/driver/GPU/OS) | Product Lead | done | Matrix published and versioned in `COMPATIBILITY_MATRIX.md` |
-| SEC-001 | Add LICENSE + third-party NOTICES | Product Lead | in_progress | `LICENSE` + `NOTICE` drafts added; legal review/final notices for distributed artifacts pending |
+| SEC-001 | Add LICENSE + third-party NOTICES | Product Lead | done | `LICENSE` finalized as MIT and `NOTICE` updated with project license declaration + third-party notice posture |
 | SEC-002 | Dependency/license scan integrated in CI | Platform Engineer | done | Workflow `dependency-license-scan.yml` added; CI fails on pip-audit vulnerabilities or license policy violations |
 | SEC-003 | Define vulnerability response SLA/process | Product Lead | done | `SECURITY.md` policy merged with reporting path and response SLA |
 

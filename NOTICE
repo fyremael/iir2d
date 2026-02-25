@@ -1,6 +1,9 @@
 IIR2D Third-Party Notices
 Updated: 2026-02-25 UTC
 
+Project license:
+1. This repository is licensed under the MIT License (`LICENSE`).
+
 This project includes or depends on third-party components at build/runtime.
 Before external distribution, legal review must verify final notice text and
 license obligations for all bundled dependencies.

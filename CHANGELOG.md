@@ -47,6 +47,7 @@
 6. Core runtime API now exposes version and build fingerprint query functions, validated in `scripts/smoke_core_status.py`.
 7. Linux self-hosted CI now enforces CUDA-vs-CPU parity matrix validation in `.github/workflows/cuda-cross-platform.yml`.
 8. Benchmark protocol upgraded to v1.1 with claim packet generation and sign-off workflow in `BENCHMARK_PROTOCOL.md`.
+9. Legal posture finalized to MIT license in `LICENSE`; `NOTICE` now declares project license explicitly.
 
 ## [1.0.0] - 2026-02-24
 ### Added

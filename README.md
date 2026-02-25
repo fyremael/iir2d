@@ -100,6 +100,20 @@ CSV columns include:
 Claim publication protocol:
 1. `BENCHMARK_PROTOCOL.md`
 
+## CPU Parity Contract + Validator
+Canonical CPU parity contract:
+1. `CPU_REFERENCE_DECISION.md`
+
+Run CUDA-vs-CPU matrix validation:
+```bash
+python3 scripts/validate_cuda_cpu_matrix.py \
+  --sizes 63x47 \
+  --filter_ids 1,2,3,4,5,6,7,8 \
+  --border_modes clamp,mirror,wrap,constant \
+  --precisions f32,mixed,f64 \
+  --border_const 0.125
+```
+
 Release governance:
 1. `RELEASE_GATE_POLICY.md`
 2. `RELEASE_CHECKLIST.md`

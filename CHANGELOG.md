@@ -33,6 +33,9 @@
 15. Nightly performance regression automation:
    1. `.github/workflows/nightly-perf-regression.yml`
    2. `scripts/check_perf_regression.py`
+16. Canonical CPU reference contract decision in `CPU_REFERENCE_DECISION.md`.
+17. Canonical CPU reference implementation for filters `1..8` in `scripts/iir2d_cpu_reference.py`.
+18. CUDA-vs-CPU matrix validator in `scripts/validate_cuda_cpu_matrix.py`.
 
 ### Changed
 1. Documentation for benchmark execution and runner validation in `README.md` and `RUNNER_SETUP.md`.
@@ -41,6 +44,7 @@
 4. RC1 CI evidence upgraded from hosted fallback to real self-hosted CUDA runs (`#4`, `#5`) on 2026-02-25 UTC.
 5. RC1 closeout checklist and sign-off tables were finalized with delegated role approvals under Product Lead directive.
 6. Core runtime API now exposes version and build fingerprint query functions, validated in `scripts/smoke_core_status.py`.
+7. Linux self-hosted CI now enforces CUDA-vs-CPU parity matrix validation in `.github/workflows/cuda-cross-platform.yml`.
 
 ## [1.0.0] - 2026-02-24
 ### Added

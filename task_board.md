@@ -7,8 +7,8 @@ Status values: `in_progress`, `blocked`, `done`
 |---|---|---|---|---|
 | ENG-001 | Freeze C API/ABI contract and semantic versioning policy | Core Kernel Engineer | done | Versioned header + ABI policy doc merged |
 | ENG-002 | Add strict input validation and error code table | Core Kernel Engineer | done | Invalid params produce deterministic non-zero error codes; doc published |
-| ENG-003 | Implement CPU reference kernels for parity testing | QA Engineer | blocked | Blocked pending canonical CPU reference design for all recursive filter variants (`1..8`) and border semantics alignment |
-| ENG-004 | Create CUDA-vs-CPU correctness matrix tests | QA Engineer | blocked | Blocked by `ENG-003` CPU reference completion |
+| ENG-003 | Implement CPU reference kernels for parity testing | QA Engineer | done | Canonical contract documented in `CPU_REFERENCE_DECISION.md` and implemented in `scripts/iir2d_cpu_reference.py` for filters `1..8` + border/precision semantics |
+| ENG-004 | Create CUDA-vs-CPU correctness matrix tests | QA Engineer | done | `scripts/validate_cuda_cpu_matrix.py` validates filter/border/precision matrix and Linux self-hosted CI gate runs the parity matrix |
 | ENG-005 | Build reproducible benchmark harness v1 | Platform Engineer | done | `scripts/benchmark_core_cuda.py` outputs p50/p95 latency + throughput with environment metadata CSV; Linux benchmark smoke wired into CI |
 | REL-001 | Define release checklist and release gate policy | Product Lead | done | Policy/checklist established and applied to RC promotion (`release_records/RC_2026-02-25_RC1.md`); self-hosted CI evidence and delegated sign-off closure complete |
 
@@ -48,7 +48,8 @@ Status values: `in_progress`, `blocked`, `done`
 |---|---|---|---|---|
 | ENG-001 | API/ABI freeze | Core Kernel Engineer | done | Added version macros + ABI policy + changelog entry |
 | ENG-002 | Validation + error model | Core Kernel Engineer | done | Strict validation + stable status codes implemented |
-| ENG-003 | CPU reference baseline | QA Engineer | blocked | Waiting on canonical CPU reference design decision for filters `1..8` |
+| ENG-003 | CPU reference baseline | QA Engineer | done | Decision doc + CPU reference implementation landed (`CPU_REFERENCE_DECISION.md`, `scripts/iir2d_cpu_reference.py`) |
+| ENG-004 | CUDA-vs-CPU parity matrix | QA Engineer | done | Matrix validator landed and wired into Linux self-hosted CI (`scripts/validate_cuda_cpu_matrix.py`) |
 | ENG-006 | CI build + smoke runner validation | Platform Engineer | done | Self-hosted runs `#4` and `#5` passed on Linux/Windows CUDA jobs; fallback jobs skipped by design under `IIR2D_USE_SELF_HOSTED=true` |
 | ENG-005 | Benchmark harness v1 | Platform Engineer | done | Core C API harness implemented; sample evidence captured on 2026-02-25 (`/tmp/iir2d_core_bench_smoke.csv`) |
 | REL-001 | Release gate checklist | Product Lead | done | RC1 promoted using checklist record; CI links, self-hosted evidence, and delegated role sign-offs are recorded |
@@ -64,7 +65,7 @@ Status values: `in_progress`, `blocked`, `done`
 | 2026-02-25 | RC promotion criteria were not formalized in repo | Product Lead | Added release gate policy/checklist and executed first formal RC pass record (`RC_2026-02-25_RC1`) | mitigated |
 | 2026-02-25 | RC1 audit closeout pending remaining human sign-offs | Product Lead | Resolved: delegated Core/Platform/QA sign-offs recorded per Product Lead directive (2026-02-25T07:59:01Z) | mitigated |
 | 2026-02-25 | No self-hosted CUDA runners registered in GitHub repo (`runner_count=0`) | Platform Engineer | Resolved: runners registered and runs `#4/#5` completed with self-hosted Linux/Windows jobs | mitigated |
-| 2026-02-25 | CPU reference parity track is unresolved (`ENG-003`/`ENG-004`) | QA Engineer | Define canonical CPU implementation scope, then wire matrix correctness tests in CI | open |
+| 2026-02-25 | CPU reference parity track is unresolved (`ENG-003`/`ENG-004`) | QA Engineer | Resolved: canonical contract + CPU reference + CI parity matrix validator landed | mitigated |
 | 2026-02-25 | Design-partner pilot launch depends on external counterparties (`GTM-004`) | GTM Lead | Run outbound sequence using `DESIGN_PARTNER_PILOT_TEMPLATE.md` and secure 3 signed pilot plans | open |
 | TBD | Ambiguous quality claims | GTM Lead | Protocol drafted (`BENCHMARK_PROTOCOL.md`) and core harness artifacts available; pending GTM sign-off | in_progress |
 

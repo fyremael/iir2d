@@ -3,6 +3,10 @@
 This document defines the required setup for GitHub Actions self-hosted runners used by:
 `/.github/workflows/cuda-cross-platform.yml`
 
+Workflow mode selector:
+1. Set repository variable `IIR2D_USE_SELF_HOSTED=true` to enable self-hosted CUDA jobs.
+2. If unset, hosted fallback jobs run for control-plane validation only.
+
 ## Required Runner Labels
 ## Linux runner
 1. `self-hosted`
@@ -86,10 +90,11 @@ powershell -ExecutionPolicy Bypass -File .\scripts\build_and_smoke_windows.ps1
 ## CI Bring-Up Checklist
 1. Register one Linux runner and one Windows runner with required labels.
 2. Run validation commands on each host.
-3. Trigger `cuda-cross-platform` workflow via `workflow_dispatch`.
-4. Confirm both jobs pass.
-5. Run core benchmark harness and archive CSV artifact.
-6. Mark `ENG-006` done in `task_board.md`.
+3. Set repository variable `IIR2D_USE_SELF_HOSTED=true`.
+4. Trigger `cuda-cross-platform` workflow via `workflow_dispatch`.
+5. Confirm both self-hosted jobs pass (not skipped).
+6. Run core benchmark harness and archive CSV artifact.
+7. Mark `ENG-006` done in `task_board.md`.
 
 ## Common Failures
 1. `No CUDA toolset found`:

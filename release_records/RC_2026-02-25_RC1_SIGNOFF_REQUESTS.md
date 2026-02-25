@@ -22,12 +22,14 @@ Subject: `RC1 sign-off request (Platform Engineer) - IIR2D`
 Message:
 1. Please review `release_records/RC_2026-02-25_RC1.md`.
 2. Verify operability evidence refs: `B1`, `B2`, `B3`.
-3. Add CI run links/artifact links when available.
+3. Validate CI run/artifact links and note the self-hosted-runner waiver context.
 4. Confirm decision as `approve` or `reject` and fill your row.
 
 Evidence shortcuts:
-1. Linux benchmark logs: `release_records/evidence/RC_2026-02-25_RC1/pass1_linux_benchmark_smoke.txt`, `release_records/evidence/RC_2026-02-25_RC1/pass2_linux_benchmark_smoke.txt`
-2. Benchmark artifacts: `release_records/artifacts/RC_2026-02-25_RC1/pass1_linux_core_benchmark_smoke.csv`, `release_records/artifacts/RC_2026-02-25_RC1/pass2_linux_core_benchmark_smoke.csv`
+1. CI run `#2`: `https://github.com/fyremael/iir2d/actions/runs/22385701614`
+2. CI run `#3`: `https://github.com/fyremael/iir2d/actions/runs/22385719027`
+3. Benchmark artifact: `https://github.com/fyremael/iir2d/actions/runs/22385719027/artifacts/5648906204`
+4. Linux benchmark logs: `release_records/evidence/RC_2026-02-25_RC1/pass1_linux_benchmark_smoke.txt`, `release_records/evidence/RC_2026-02-25_RC1/pass2_linux_benchmark_smoke.txt`
 
 ## Request 3: QA Engineer
 Subject: `RC1 sign-off request (QA Engineer) - IIR2D`

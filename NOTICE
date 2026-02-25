@@ -1,0 +1,16 @@
+IIR2D Third-Party Notices
+Updated: 2026-02-25 UTC
+
+This project includes or depends on third-party components at build/runtime.
+Before external distribution, legal review must verify final notice text and
+license obligations for all bundled dependencies.
+
+Initial dependency surface (non-exhaustive):
+1. CUDA Toolkit components (NVIDIA)
+2. PyTorch (when building/using torch bindings)
+3. JAX and jaxlib (when building/using JAX bindings)
+4. Python packaging/runtime dependencies listed in setup/build scripts
+
+Release requirement:
+1. Replace this draft with a finalized bill of materials and license attributions
+   for the exact distributed artifact set.

@@ -50,10 +50,13 @@ Prerequisites:
 3. Python (`python3` on Linux/WSL, `python` on Windows)
 
 CI:
-1. `.github/workflows/cuda-cross-platform.yml` runs Linux and Windows CUDA build+smoke on self-hosted runners.
+1. `.github/workflows/cuda-cross-platform.yml` supports two modes:
+   1. Self-hosted CUDA mode (`IIR2D_USE_SELF_HOSTED=true`): Linux + Windows CUDA jobs run.
+   2. Hosted fallback mode (default): control-plane validation only; self-hosted CUDA jobs are skipped.
 2. CI policy:
    1. Linux job runs full smoke (`scripts/build_and_smoke_wsl.sh`).
    2. Windows job runs status-only smoke (`scripts/build_and_smoke_windows.ps1 -SkipGpuSmoke`).
+   3. Hosted fallback uploads a benchmark artifact from repository evidence path for audit continuity.
 3. Required runner labels:
    1. Linux: `self-hosted`, `linux`, `x64`, `gpu`, `cuda`
    2. Windows: `self-hosted`, `windows`, `x64`, `gpu`, `cuda`

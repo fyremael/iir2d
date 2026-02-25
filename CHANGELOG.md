@@ -12,9 +12,12 @@
 8. RC1 evidence packet notes in `release_records/evidence/RC_2026-02-25_RC1/`.
 9. RC1 closeout execution docs: `release_records/RC_2026-02-25_RC1_SIGNOFF_REQUESTS.md` and `release_records/RC_2026-02-25_RC1_CLOSEOUT_CHECKLIST.md`.
 10. RC1 promotion decision recorded in `release_records/RC_2026-02-25_RC1.md`.
+11. Initial legal/security scaffolding: `LICENSE`, `NOTICE`, and `SECURITY.md`.
 
 ### Changed
 1. Documentation for benchmark execution and runner validation in `README.md` and `RUNNER_SETUP.md`.
+2. RC1 record hard-close audit updates, including backfilled GitHub run/artifact links and CI qualification notes.
+3. CI workflow includes hosted bootstrap fallback mode gated by repo variable `IIR2D_USE_SELF_HOSTED`.
 
 ## [1.0.0] - 2026-02-24
 ### Added

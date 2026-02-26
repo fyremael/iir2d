@@ -124,13 +124,12 @@ def test_find_cudart_posix_success_and_failure(monkeypatch: pytest.MonkeyPatch) 
 
 
 def test_find_cudart_windows_prefers_cuda_root(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(harness.os, "name", "nt")
-
     with tempfile.TemporaryDirectory(dir=Path(__file__).resolve().parents[1]) as tmp:
         fake_root = Path(tmp) / "cuda_root"
         dll_path = fake_root / "v13.1" / "bin" / "cudart64_130.dll"
         dll_path.parent.mkdir(parents=True, exist_ok=True)
         dll_path.write_text("", encoding="utf-8")
+        monkeypatch.setattr(harness.os, "name", "nt")
 
         real_path_type = type(fake_root)
 

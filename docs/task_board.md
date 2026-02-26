@@ -62,7 +62,7 @@ Status values: `in_progress`, `blocked`, `done`
 ## Risks and Blockers Log
 | Date | Risk | Owner | Mitigation | Status |
 |---|---|---|---|---|
-| TBD | Performance gap vs tuned alternatives | Core Kernel Engineer | Focus on niche workloads + pipeline-level evidence | open |
+| 2026-02-26 | Performance gap vs tuned alternatives | Core Kernel Engineer | Focus on niche workloads + pipeline-level evidence | open |
 | 2026-02-24 | Native Windows build blocked on local host: CUDA toolkit is v11.0 (below supported floor) | Platform Engineer | Installed CUDA 13.1 on 2026-02-25; build now uses nvcc 13.1 | mitigated |
 | 2026-02-25 | Linux/WSL build+smoke validated locally (`scripts/build_and_smoke_wsl.sh` passed; JAX saw `CudaDevice(id=0)`) | Platform Engineer | Keep Linux runner labels/config aligned with `RUNNER_SETUP.md`; attach CI run evidence | mitigated |
 | 2026-02-25 | Windows full smoke blocked: JAX runtime sees CPU only (`devices [CpuDevice(id=0)]`) on local host | Platform Engineer | Adopted CI policy to run Windows status-only smoke (`-SkipGpuSmoke`); keep Linux as full JAX GPU smoke gate | mitigated |
@@ -73,7 +73,7 @@ Status values: `in_progress`, `blocked`, `done`
 | 2026-02-25 | CPU reference parity track is unresolved (`ENG-003`/`ENG-004`) | QA Engineer | Resolved: canonical contract + CPU reference + CI parity matrix validator landed | mitigated |
 | 2026-02-26 | Packaging path did not emit a consumable `iir2d_video` wheel/report pack for release handoff | Platform Engineer | Resolved: `setup.py` now supports pure wheel mode (`IIR2D_SKIP_EXT=1`) and `release-artifacts.yml` publishes wheel + report-pack artifacts | mitigated |
 | 2026-02-25 | Design-partner pilot launch depends on external counterparties (`GTM-004`) | GTM Lead | Wave 1 launch kit prepared (`PILOT_WAVE1_EXECUTION.md`, `release_records/pilot_wave1/`); execute outreach and close 3 signed pilot plans | in_progress |
-| TBD | Ambiguous quality claims | GTM Lead | Mitigated by finalized benchmark protocol + claims packet workflow and sign-off gates | mitigated |
+| 2026-02-26 | Ambiguous quality claims | GTM Lead | Mitigated by finalized benchmark protocol + claims packet workflow and sign-off gates | mitigated |
 
 ## Definition of Ready (Task Intake)
 1. Owner assigned.

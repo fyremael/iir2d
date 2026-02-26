@@ -52,7 +52,7 @@
    3. `tests/test_perf_regression.py`
 23. GitHub quality gate workflow: `.github/workflows/quality-gates.yml`.
 24. Full-matrix regression comparator: `scripts/check_perf_regression_matrix.py`.
-25. Approved full protocol benchmark baseline artifact: `release_records/artifacts/benchmark_baselines/core_protocol_v1.csv`.
+25. Approved full protocol benchmark baseline artifact: `release_records/artifacts/benchmark_baselines/core_protocol_v2_all8.csv`.
 26. Shared harness runtime module: `scripts/core_harness.py`.
 27. Harness-focused unit tests:
    1. `tests/test_core_harness.py`
@@ -61,6 +61,8 @@
 29. Asset size policy gate script and tests:
    1. `scripts/check_asset_sizes.py`
    2. `tests/test_check_asset_sizes.py`
+30. Typed video wrapper package in `iir2d_video/` now included in wheel packaging.
+31. Release artifact workflow: `.github/workflows/release-artifacts.yml` (wheel + video report-pack artifact outputs).
 
 ### Changed
 1. Documentation for benchmark execution and runner validation in `README.md` and `RUNNER_SETUP.md`.
@@ -83,6 +85,8 @@
 18. Quality gates now enforce tracked image asset size policy at `<=25 MiB` per file.
 19. `visual_showcase/assets/` switched from PNG-heavy payloads to compressed WebP assets for lighter demo delivery.
 20. `visual_showcase/index.html` redesigned as a new interactive showcase surface with scene tabs, split-view theater, and refreshed visual system.
+21. `setup.py` now supports pure wheel builds via `IIR2D_SKIP_EXT=1` and packages `iir2d_video` + `scripts` for distribution.
+22. `task_board.md` and `RC_2026-02-25_PREP.md` updated to reflect packaging/release-artifact readiness evidence.
 
 ## [1.0.0] - 2026-02-24
 ### Added

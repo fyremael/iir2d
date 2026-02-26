@@ -16,11 +16,12 @@ Status values: `in_progress`, `blocked`, `done`
 | ID | Task | Owner | Status | Acceptance Criteria |
 |---|---|---|---|---|
 | ENG-006 | CI pipeline for build + tests + benchmark smoke | Platform Engineer | done | Self-hosted CUDA runners registered (Linux + Windows), `IIR2D_USE_SELF_HOSTED=true`, and two consecutive self-hosted runs succeeded (`#4`, `#5`) with benchmark artifact evidence |
-| ENG-007 | Nightly performance regression jobs on reference GPUs | Platform Engineer | done | Nightly workflow runs full benchmark protocol matrix, compares vs committed baseline (`core_protocol_v1.csv`), and uploads CSV + trend report artifacts |
+| ENG-007 | Nightly performance regression jobs on reference GPUs | Platform Engineer | done | Nightly workflow runs full benchmark protocol matrix, compares vs committed baseline (`core_protocol_v2_all8.csv`), and uploads CSV + trend report artifacts |
 | ENG-008 | Linux binary packaging and install docs | Platform Engineer | done | Linux packaging/install guide published in `PACKAGING_LINUX.md` with one-command consume path |
 | ENG-009 | Windows binary packaging and install docs | Platform Engineer | done | Windows packaging/install guide published in `PACKAGING_WINDOWS.md` with one-command consume path |
 | ENG-010 | Compatibility matrix (CUDA/driver/GPU/OS) | Product Lead | done | Matrix published and versioned in `COMPATIBILITY_MATRIX.md` |
 | ENG-011 | Add lint and unit-coverage quality gates | Platform Engineer | done | `quality-gates.yml` enforces ruff + pytest coverage (`>=85%` on core harness modules) |
+| ENG-012 | Package `iir2d_video` and publish release artifacts | Platform Engineer | done | `setup.py` ships `iir2d_video` + `scripts` in wheel mode (`IIR2D_SKIP_EXT=1`), and `.github/workflows/release-artifacts.yml` uploads wheel + video report-pack artifacts |
 | SEC-001 | Add LICENSE + third-party NOTICES | Product Lead | done | `LICENSE` finalized as MIT and `NOTICE` updated with project license declaration + third-party notice posture |
 | SEC-002 | Dependency/license scan integrated in CI | Platform Engineer | done | Workflow `dependency-license-scan.yml` added; CI fails on pip-audit vulnerabilities or license policy violations |
 | SEC-003 | Define vulnerability response SLA/process | Product Lead | done | `SECURITY.md` policy merged with reporting path and response SLA |
@@ -54,6 +55,7 @@ Status values: `in_progress`, `blocked`, `done`
 | ENG-006 | CI build + smoke runner validation | Platform Engineer | done | Self-hosted runs `#4` and `#5` passed on Linux/Windows CUDA jobs; fallback jobs skipped by design under `IIR2D_USE_SELF_HOSTED=true` |
 | ENG-005 | Benchmark harness v1 | Platform Engineer | done | Core C API harness implemented; sample evidence captured on 2026-02-25 (`/tmp/iir2d_core_bench_smoke.csv`) |
 | ENG-011 | Lint + unit coverage gate | Platform Engineer | done | Added `quality-gates.yml` with ruff lint and pytest coverage threshold on core harness modules |
+| ENG-012 | `iir2d_video` packaging + release artifacts | Platform Engineer | done | `setup.py` now includes `iir2d_video`/`scripts` in wheel mode and `release-artifacts.yml` emits wheel + report-pack artifacts |
 | REL-001 | Release gate checklist | Product Lead | done | RC1 promoted using checklist record; CI links, self-hosted evidence, and delegated role sign-offs are recorded |
 | GTM-004 | Design-partner pilot launch (Wave 1) | GTM Lead | in_progress | Outreach templates and 3 pilot briefs prepared in `release_records/pilot_wave1/`; outbound + signed agreements pending |
 
@@ -69,6 +71,7 @@ Status values: `in_progress`, `blocked`, `done`
 | 2026-02-25 | RC1 audit closeout pending remaining human sign-offs | Product Lead | Resolved: delegated Core/Platform/QA sign-offs recorded per Product Lead directive (2026-02-25T07:59:01Z) | mitigated |
 | 2026-02-25 | No self-hosted CUDA runners registered in GitHub repo (`runner_count=0`) | Platform Engineer | Resolved: runners registered and runs `#4/#5` completed with self-hosted Linux/Windows jobs | mitigated |
 | 2026-02-25 | CPU reference parity track is unresolved (`ENG-003`/`ENG-004`) | QA Engineer | Resolved: canonical contract + CPU reference + CI parity matrix validator landed | mitigated |
+| 2026-02-26 | Packaging path did not emit a consumable `iir2d_video` wheel/report pack for release handoff | Platform Engineer | Resolved: `setup.py` now supports pure wheel mode (`IIR2D_SKIP_EXT=1`) and `release-artifacts.yml` publishes wheel + report-pack artifacts | mitigated |
 | 2026-02-25 | Design-partner pilot launch depends on external counterparties (`GTM-004`) | GTM Lead | Wave 1 launch kit prepared (`PILOT_WAVE1_EXECUTION.md`, `release_records/pilot_wave1/`); execute outreach and close 3 signed pilot plans | in_progress |
 | TBD | Ambiguous quality claims | GTM Lead | Mitigated by finalized benchmark protocol + claims packet workflow and sign-off gates | mitigated |
 

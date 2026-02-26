@@ -1,0 +1,55 @@
+name: release-artifacts
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-wheel-and-report-pack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build pure-Python wheel (video/report toolchain)
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip build
+          IIR2D_SKIP_EXT=1 python -m build --wheel --outdir dist
+
+      - name: Validate wheel imports
+        shell: bash
+        run: |
+          python -m pip install --force-reinstall dist/*.whl
+          python -c "import iir2d_video, scripts; print('wheel_import_ok')"
+
+      - name: Build release report-pack artifact
+        shell: bash
+        run: |
+          python scripts/build_video_report_pack.py \
+            --benchmark_csvs release_records/artifacts/video_reports/portrait_f1_bench.csv \
+            --quality_csvs release_records/artifacts/video_reports/portrait_f1_quality.csv \
+            --clips visual_showcase/assets/video_demo/compare_portrait_original_f1_f4_f8.mp4 \
+            --out_md release_records/artifacts/video_reports/ci_release_report_pack.md
+
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-wheel
+          path: dist/*.whl
+
+      - name: Upload report-pack artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-video-report-pack
+          path: |
+            release_records/artifacts/video_reports/portrait_f1_bench.csv
+            release_records/artifacts/video_reports/portrait_f1_quality.csv
+            release_records/artifacts/video_reports/ci_release_report_pack.md

@@ -31,6 +31,12 @@ Commercialization docs:
 cd iir2d_op
 python setup.py install
 ```
+For packaging-only wheel builds (includes `iir2d_video` + `scripts`, skips CUDA extension build):
+```bash
+cd iir2d_op
+python3 -m pip install --upgrade build
+IIR2D_SKIP_EXT=1 python3 -m build --wheel --outdir dist
+```
 
 ### JAX
 ```bash
@@ -105,6 +111,9 @@ python3 -m pytest tests \
   --cov-report=term-missing \
   --cov-fail-under=85
 ```
+7. Release artifact workflow:
+   1. `.github/workflows/release-artifacts.yml`
+   2. On `workflow_dispatch` or `v*` tags, builds a wheel (`IIR2D_SKIP_EXT=1`) and uploads a standardized video report-pack artifact.
 
 ## Core Benchmark Harness (Commercialization Baseline)
 Use the C API benchmark harness to produce reproducible p50/p95 latency and throughput, with environment metadata attached to every row:

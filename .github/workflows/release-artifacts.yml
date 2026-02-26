@@ -6,6 +6,9 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write
+
 jobs:
   enforce-self-hosted-release-policy:
     if: ${{ startsWith(github.ref, 'refs/tags/') && vars.IIR2D_USE_SELF_HOSTED != 'true' }}

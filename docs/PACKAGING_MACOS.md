@@ -12,6 +12,7 @@ Contents:
 Notes:
 1. macOS bundles are CPU-stub binaries and return `IIR2D_STATUS_CUDA_ERROR` for CUDA execution entrypoints.
 2. Use these artifacts for contract validation and packaging integration; production filtering remains the CUDA Linux/Windows path.
+3. Cross-compiling `x86_64` on Apple Silicon may require `IIR2D_SKIP_RUNTIME_SMOKE=1` because host runtime cannot load the foreign-arch dylib.
 
 Build + package locally:
 ```bash

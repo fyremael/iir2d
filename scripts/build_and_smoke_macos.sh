@@ -20,4 +20,8 @@ cmake --build build_macos -j
 
 cp -f build_macos/libiir2d_jax.dylib python/iir2d_jax/libiir2d_jax.dylib
 
-PYTHONPATH="$ROOT/python" python3 "$ROOT/scripts/smoke_core_status.py"
+if [[ "${IIR2D_SKIP_RUNTIME_SMOKE:-0}" == "1" ]]; then
+  echo "Skipping runtime smoke for cross-compiled artifact."
+else
+  PYTHONPATH="$ROOT/python" python3 "$ROOT/scripts/smoke_core_status.py"
+fi

@@ -1,12 +1,14 @@
-import os
 import importlib
+
 import torch
+
 
 def _load_ext():
     try:
         return importlib.import_module("iir2d_torch_ext")
     except Exception as e:
         raise RuntimeError("iir2d_torch_ext not built. Run `python setup.py install` in iir2d_op.") from e
+
 
 class _IIR2DAutograd(torch.autograd.Function):
     @staticmethod
@@ -24,9 +26,9 @@ class _IIR2DAutograd(torch.autograd.Function):
         return grad_input, None, None, None, None
 
 def iir2d(x, filter_id=1, border="mirror", border_const=0.0, precision="f32"):
-    ext = _load_ext()
-    border_mode = {"clamp":0, "mirror":1, "wrap":2, "constant":3}.get(border, 1)
-    prec_mode = {"f32":0, "mixed":1, "f64":2}.get(precision, 0)
+    _load_ext()
+    border_mode = {"clamp": 0, "mirror": 1, "wrap": 2, "constant": 3}.get(border, 1)
+    prec_mode = {"f32": 0, "mixed": 1, "f64": 2}.get(precision, 0)
     if x.dim() == 2:
         return _IIR2DAutograd.apply(x, int(filter_id), int(border_mode), float(border_const), int(prec_mode))
     if x.dim() == 3:
@@ -43,10 +45,13 @@ def iir2d(x, filter_id=1, border="mirror", border_const=0.0, precision="f32"):
         for ni in range(n):
             outs_c = []
             for ci in range(c):
-                outs_c.append(_IIR2DAutograd.apply(x[ni, ci], int(filter_id), int(border_mode), float(border_const), int(prec_mode)))
+                outs_c.append(
+                    _IIR2DAutograd.apply(x[ni, ci], int(filter_id), int(border_mode), float(border_const), int(prec_mode))
+                )
             outs.append(torch.stack(outs_c, dim=0))
         return torch.stack(outs, dim=0)
     raise ValueError("iir2d expects 2D, 3D (CHW), or 4D (NCHW) tensor")
+
 
 class IIR2D(torch.nn.Module):
     def __init__(self, filter_id=1, border="mirror", border_const=0.0, precision="f32"):

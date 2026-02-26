@@ -7,7 +7,6 @@ import argparse
 import json
 from pathlib import Path
 
-
 DENY_PATTERNS = ("AGPL", "GPL-3.0-only", "GPLv3")
 
 

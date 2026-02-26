@@ -1,7 +1,8 @@
-from typing import Sequence, Tuple
+from collections.abc import Sequence
 
 import jax
 import jax.numpy as jnp
+
 if not hasattr(jax.config, "define_bool_state"):
     def _define_bool_state(name: str, default: bool, help_str: str):
         del help_str
@@ -110,7 +111,7 @@ class IIRDenoiseStem(nn.Module):
     """Small practical block: Conv -> IIR bank -> Conv + residual."""
 
     channels: int = 32
-    filter_ids: Tuple[int, ...] = (1, 3, 4, 8)
+    filter_ids: tuple[int, ...] = (1, 3, 4, 8)
     precision: str = "f32"
 
     @nn.compact

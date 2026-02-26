@@ -1,5 +1,5 @@
-import os
 import ctypes
+import os
 import struct
 from functools import partial
 

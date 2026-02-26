@@ -1,7 +1,7 @@
 import sys
+
 import jax
 import jax.numpy as jnp
-
 from iir2d_jax import iir2d
 
 
@@ -9,7 +9,6 @@ def main():
     print("jax", jax.__version__)
     try:
         import jaxlib  # noqa: F401
-        import jaxlib  # type: ignore
         print("jaxlib", jaxlib.__version__)
     except Exception as exc:
         print("jaxlib import failed:", exc)

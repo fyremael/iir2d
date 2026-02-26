@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 
 def _read_csv(path):
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
 
@@ -55,7 +55,7 @@ def plot_history(history_rows, out_dir):
 
     fig, ax = plt.subplots(figsize=(8, 4.8))
     for model, vals in grouped.items():
-        paired = sorted(zip(vals["step"], vals["loss"]))
+        paired = sorted(zip(vals["step"], vals["loss"], strict=False))
         xs = [p[0] for p in paired]
         ys = [p[1] for p in paired]
         ax.plot(xs, ys, marker="o", markersize=3, linewidth=1.8, label=model)

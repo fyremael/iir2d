@@ -3,7 +3,6 @@ import os
 import sys
 from pathlib import Path
 
-
 EXPECTED = {
     0: "ok",
     -1: "invalid_argument",

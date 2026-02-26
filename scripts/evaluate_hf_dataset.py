@@ -2,16 +2,14 @@ import argparse
 import csv
 import time
 from dataclasses import dataclass
-from typing import Dict, List, Sequence, Tuple
 
 import jax
 import jax.numpy as jnp
-from jax import lax
 import numpy as np
 import optax
 from datasets import load_dataset
-
 from iir2d_jax import iir2d, iir2d_vjp
+from jax import lax
 
 
 def iir_nhwc(x: jnp.ndarray, filter_id: int = 4, differentiable: bool = False) -> jnp.ndarray:
@@ -67,7 +65,7 @@ def random_crop(rng: np.random.Generator, img: np.ndarray, patch: int) -> np.nda
     return img[y0:y0 + patch, x0:x0 + patch, :]
 
 
-def make_noisy(clean: np.ndarray, sigma: float, rng: np.random.Generator) -> Tuple[np.ndarray, np.ndarray]:
+def make_noisy(clean: np.ndarray, sigma: float, rng: np.random.Generator) -> tuple[np.ndarray, np.ndarray]:
     noise = rng.normal(0.0, sigma, size=clean.shape).astype(np.float32)
     noisy = np.clip(clean + noise, 0.0, 1.0)
     return noisy, clean
@@ -83,21 +81,21 @@ class Config:
     channels: int
 
 
-def init_baseline_params(key: jnp.ndarray, in_ch: int, hidden: int = 32) -> Dict[str, jnp.ndarray]:
+def init_baseline_params(key: jnp.ndarray, in_ch: int, hidden: int = 32) -> dict[str, jnp.ndarray]:
     k1, k2 = jax.random.split(key)
     w1 = 0.05 * jax.random.normal(k1, (3, 3, in_ch, hidden), dtype=jnp.float32)
     w2 = 0.05 * jax.random.normal(k2, (3, 3, hidden, in_ch), dtype=jnp.float32)
     return {"w1": w1, "w2": w2}
 
 
-def apply_baseline(params: Dict[str, jnp.ndarray], x: jnp.ndarray) -> jnp.ndarray:
+def apply_baseline(params: dict[str, jnp.ndarray], x: jnp.ndarray) -> jnp.ndarray:
     h = conv2d_nhwc(x, params["w1"])
     h = jax.nn.gelu(h)
     h = conv2d_nhwc(h, params["w2"])
     return x + h
 
 
-def init_iir_frozen_params(key: jnp.ndarray, in_ch: int, hidden: int = 32, num_filters: int = 4) -> Dict[str, jnp.ndarray]:
+def init_iir_frozen_params(key: jnp.ndarray, in_ch: int, hidden: int = 32, num_filters: int = 4) -> dict[str, jnp.ndarray]:
     k1, k2, k3 = jax.random.split(key, 3)
     w1 = 0.05 * jax.random.normal(k1, (3, 3, in_ch, hidden), dtype=jnp.float32)
     w2 = 0.05 * jax.random.normal(k2, (3, 3, hidden, in_ch), dtype=jnp.float32)
@@ -110,7 +108,7 @@ def init_iir_residual_params(
     in_ch: int,
     hidden: int = 32,
     num_filters: int = 4,
-) -> Dict[str, jnp.ndarray]:
+) -> dict[str, jnp.ndarray]:
     k1, k2, k3, k4 = jax.random.split(key, 4)
     w1 = 0.05 * jax.random.normal(k1, (3, 3, in_ch, hidden), dtype=jnp.float32)
     w2 = 0.05 * jax.random.normal(k2, (3, 3, hidden, in_ch), dtype=jnp.float32)
@@ -123,7 +121,7 @@ def init_iir_residual_params(
     return {"w1": w1, "w2": w2, "logits": logits, "w_proj": w_proj, "gain_logit": gain_logit}
 
 
-def apply_iir_frozen(params: Dict[str, jnp.ndarray], x: jnp.ndarray, filter_ids: Tuple[int, ...] = (1, 3, 4, 8)) -> jnp.ndarray:
+def apply_iir_frozen(params: dict[str, jnp.ndarray], x: jnp.ndarray, filter_ids: tuple[int, ...] = (1, 3, 4, 8)) -> jnp.ndarray:
     ys = [iir_nhwc(x, filter_id=int(fid), differentiable=False) for fid in filter_ids]
     stack = jnp.stack(ys, axis=0)
     w = jax.nn.softmax(params["logits"], axis=0).reshape((len(filter_ids), 1, 1, 1, -1))
@@ -136,9 +134,9 @@ def apply_iir_frozen(params: Dict[str, jnp.ndarray], x: jnp.ndarray, filter_ids:
 
 
 def apply_iir_residual(
-    params: Dict[str, jnp.ndarray],
+    params: dict[str, jnp.ndarray],
     x: jnp.ndarray,
-    filter_ids: Tuple[int, ...] = (1, 3, 4, 8),
+    filter_ids: tuple[int, ...] = (1, 3, 4, 8),
 ) -> jnp.ndarray:
     # Main learned conv trunk.
     trunk = conv2d_nhwc(x, params["w1"])
@@ -155,7 +153,7 @@ def apply_iir_residual(
     return x + trunk + gain * iir_feat
 
 
-def build_batch(ds, image_key: str, cfg: Config, rng: np.random.Generator) -> Dict[str, jnp.ndarray]:
+def build_batch(ds, image_key: str, cfg: Config, rng: np.random.Generator) -> dict[str, jnp.ndarray]:
     noisy_batch = []
     clean_batch = []
     n = len(ds)
@@ -187,7 +185,7 @@ def train_model(apply_fn, params, cfg: Config, train_ds, val_ds, image_key: str,
         params = optax.apply_updates(params, updates)
         return params, opt_state, loss
 
-    losses: List[float] = []
+    losses: list[float] = []
     t0 = time.perf_counter()
     for _ in range(cfg.steps):
         batch = build_batch(train_ds, image_key=image_key, cfg=cfg, rng=npr)
@@ -319,12 +317,12 @@ def main() -> int:
 
     if args.out_history_csv:
         history_rows = []
-        for i, l in enumerate(base["losses"]):
-            history_rows.append({"model": "baseline_conv", "step": i, "loss": float(l)})
-        for i, l in enumerate(frozen["losses"]):
-            history_rows.append({"model": "conv_plus_iir_frozen", "step": i, "loss": float(l)})
-        for i, l in enumerate(residual["losses"]):
-            history_rows.append({"model": "conv_plus_iir_residual", "step": i, "loss": float(l)})
+        for i, loss_value in enumerate(base["losses"]):
+            history_rows.append({"model": "baseline_conv", "step": i, "loss": float(loss_value)})
+        for i, loss_value in enumerate(frozen["losses"]):
+            history_rows.append({"model": "conv_plus_iir_frozen", "step": i, "loss": float(loss_value)})
+        for i, loss_value in enumerate(residual["losses"]):
+            history_rows.append({"model": "conv_plus_iir_residual", "step": i, "loss": float(loss_value)})
         with open(args.out_history_csv, "w", newline="", encoding="utf-8") as out_file:
             writer = csv.DictWriter(out_file, fieldnames=["model", "step", "loss"])
             writer.writeheader()

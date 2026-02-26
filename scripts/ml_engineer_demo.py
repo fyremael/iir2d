@@ -2,14 +2,12 @@ import argparse
 import csv
 import time
 from dataclasses import dataclass
-from typing import Dict, List, Tuple
 
 import jax
 import jax.numpy as jnp
-from jax import lax
 import optax
-
 from iir2d_jax import iir2d, iir2d_vjp
+from jax import lax
 
 _HAS_FLAX = False
 _FLAX_IMPORT_ERROR = ""
@@ -63,7 +61,7 @@ class Config:
     lr: float
 
 
-def synthetic_batch(key: jnp.ndarray, batch: int, size: int) -> Dict[str, jnp.ndarray]:
+def synthetic_batch(key: jnp.ndarray, batch: int, size: int) -> dict[str, jnp.ndarray]:
     k1, k2 = jax.random.split(key)
     clean = jax.random.uniform(k1, (batch, size, size, 1), minval=0.0, maxval=1.0, dtype=jnp.float32)
     clean = iir_nhwc(clean, filter_id=4, differentiable=False)
@@ -107,7 +105,7 @@ def train_model_flax(model, cfg: Config, seed: int):
             state = state.apply_gradients(grads=grads)
             return state, loss
 
-        losses: List[float] = []
+        losses: list[float] = []
         t0 = time.perf_counter()
         for _ in range(cfg.steps):
             rng, bk = jax.random.split(rng)
@@ -134,21 +132,21 @@ def train_model_flax(model, cfg: Config, seed: int):
 # -----------------------
 # Pure JAX fallback backend
 # -----------------------
-def init_baseline_params(key: jnp.ndarray, hidden: int = 32) -> Dict[str, jnp.ndarray]:
+def init_baseline_params(key: jnp.ndarray, hidden: int = 32) -> dict[str, jnp.ndarray]:
     k1, k2 = jax.random.split(key)
     w1 = 0.05 * jax.random.normal(k1, (3, 3, 1, hidden), dtype=jnp.float32)
     w2 = 0.05 * jax.random.normal(k2, (3, 3, hidden, 1), dtype=jnp.float32)
     return {"w1": w1, "w2": w2}
 
 
-def apply_baseline(params: Dict[str, jnp.ndarray], x: jnp.ndarray) -> jnp.ndarray:
+def apply_baseline(params: dict[str, jnp.ndarray], x: jnp.ndarray) -> jnp.ndarray:
     h = conv2d_nhwc(x, params["w1"])
     h = jax.nn.gelu(h)
     h = conv2d_nhwc(h, params["w2"])
     return x + h
 
 
-def init_iir_params(key: jnp.ndarray, hidden: int = 32, num_filters: int = 4) -> Dict[str, jnp.ndarray]:
+def init_iir_params(key: jnp.ndarray, hidden: int = 32, num_filters: int = 4) -> dict[str, jnp.ndarray]:
     k1, k2, k3 = jax.random.split(key, 3)
     w1 = 0.05 * jax.random.normal(k1, (3, 3, 1, hidden), dtype=jnp.float32)
     w2 = 0.05 * jax.random.normal(k2, (3, 3, hidden, 1), dtype=jnp.float32)
@@ -156,7 +154,7 @@ def init_iir_params(key: jnp.ndarray, hidden: int = 32, num_filters: int = 4) ->
     return {"w1": w1, "w2": w2, "logits": logits}
 
 
-def init_iir_frozen_params(key: jnp.ndarray, hidden: int = 32, num_filters: int = 4) -> Dict[str, jnp.ndarray]:
+def init_iir_frozen_params(key: jnp.ndarray, hidden: int = 32, num_filters: int = 4) -> dict[str, jnp.ndarray]:
     k1, k2, k3 = jax.random.split(key, 3)
     w1 = 0.05 * jax.random.normal(k1, (3, 3, 1, hidden), dtype=jnp.float32)
     w2 = 0.05 * jax.random.normal(k2, (3, 3, hidden, 1), dtype=jnp.float32)
@@ -165,7 +163,7 @@ def init_iir_frozen_params(key: jnp.ndarray, hidden: int = 32, num_filters: int 
     return {"w1": w1, "w2": w2, "logits": logits}
 
 
-def apply_iir_bank(params: Dict[str, jnp.ndarray], x: jnp.ndarray, filter_ids: Tuple[int, ...] = (1, 3, 4, 8)) -> jnp.ndarray:
+def apply_iir_bank(params: dict[str, jnp.ndarray], x: jnp.ndarray, filter_ids: tuple[int, ...] = (1, 3, 4, 8)) -> jnp.ndarray:
     h = conv2d_nhwc(x, params["w1"])
     h = jax.nn.gelu(h)
 
@@ -179,9 +177,9 @@ def apply_iir_bank(params: Dict[str, jnp.ndarray], x: jnp.ndarray, filter_ids: T
 
 
 def apply_iir_frozen_extractor(
-    params: Dict[str, jnp.ndarray],
+    params: dict[str, jnp.ndarray],
     x: jnp.ndarray,
-    filter_ids: Tuple[int, ...] = (1, 3, 4, 8),
+    filter_ids: tuple[int, ...] = (1, 3, 4, 8),
 ) -> jnp.ndarray:
     # Frozen feature extractor: no gradient through iir custom call.
     ys = [iir_nhwc(x, filter_id=int(fid), differentiable=False) for fid in filter_ids]
@@ -214,7 +212,7 @@ def train_model_jax(apply_fn, init_fn, cfg: Config, seed: int):
         params = optax.apply_updates(params, updates)
         return params, opt_state, loss
 
-    losses: List[float] = []
+    losses: list[float] = []
     t0 = time.perf_counter()
     for _ in range(cfg.steps):
         rng, bk = jax.random.split(rng)

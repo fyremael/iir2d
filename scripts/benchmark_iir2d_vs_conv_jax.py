@@ -1,13 +1,12 @@
 import argparse
 import csv
 import time
-from typing import Callable, Dict, List
+from collections.abc import Callable
 
 import jax
 import jax.numpy as jnp
-from jax import lax
-
 from iir2d_jax import iir2d
+from jax import lax
 
 
 def gaussian_kernel_1d(size: int, sigma: float, dtype=jnp.float32) -> jnp.ndarray:
@@ -59,7 +58,7 @@ def benchmark(
     x: jnp.ndarray,
     warmup: int,
     iters: int,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     jit_fn = jax.jit(fn)
     y = jit_fn(x)
     y.block_until_ready()
@@ -105,17 +104,20 @@ def main() -> int:
     )
 
     ref_kernel = gaussian_kernel_1d(15, sigma=3.0)
-    ref_fn = lambda t: separable_conv_nhwc(t, ref_kernel, repeats=1)
+
+    def ref_fn(t: jnp.ndarray) -> jnp.ndarray:
+        return separable_conv_nhwc(t, ref_kernel, repeats=1)
+
     ref = jax.jit(ref_fn)(x)
     ref.block_until_ready()
 
-    methods: Dict[str, Callable[[jnp.ndarray], jnp.ndarray]] = {
+    methods: dict[str, Callable[[jnp.ndarray], jnp.ndarray]] = {
         "iir_filter4": lambda t: iir_nhwc(t, filter_id=4, border="mirror", precision="f32"),
         "sepconv5x5_x4": lambda t: separable_conv_nhwc(t, gaussian_kernel_1d(5, 1.1), repeats=4),
         "sepconv9x9_x2": lambda t: separable_conv_nhwc(t, gaussian_kernel_1d(9, 2.2), repeats=2),
     }
 
-    rows: List[Dict[str, float]] = []
+    rows: list[dict[str, float]] = []
     for name, fn in methods.items():
         stats = benchmark(fn, x, args.warmup, args.iters)
         y = jax.jit(fn)(x)

@@ -99,6 +99,7 @@
 26. `requirements-dev.txt` now includes `numpy` to satisfy CI test-collection imports under `quality-gates`.
 27. `tests/test_core_harness.py` Windows-path simulation now uses OS-stable concrete path type to avoid Linux `WindowsPath` instantiation failures.
 28. RC prep CI evidence now shows fresh consecutive green runs for `quality-gates` (`#17/#16`) and `cuda-cross-platform` (`#19/#18`).
+29. `setup.py` now declares `numpy` as a runtime dependency so `iir2d_video` imports succeed from wheel installs in release artifact validation.
 
 ## [1.0.0] - 2026-02-24
 ### Added

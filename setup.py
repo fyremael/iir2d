@@ -53,6 +53,9 @@ setup(
         "scripts": "scripts",
     },
     packages=_discover_packages(),
+    install_requires=[
+        "numpy>=1.23",
+    ],
     ext_modules=ext_modules,
     cmdclass=cmdclass,
 )

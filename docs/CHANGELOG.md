@@ -75,6 +75,7 @@
    2. `csrc/iir2d_core_stub.cpp`
 35. Colab explainer notebook with interactive demos and entertaining exemplars:
    1. `docs/notebooks/IIR2D_Explainer_Colab.ipynb`
+36. Extended filter teaching appendix with per-filter sections in `docs/USAGE_GUIDE.md`.
 
 ### Changed
 1. Documentation for benchmark execution and runner validation in `README.md` and `RUNNER_SETUP.md`.

@@ -74,3 +74,60 @@ For each reported benchmark or release claim, keep:
 5. Reviewer sign-off entry.
 
 If any one is missing, treat the claim as draft.
+
+## Extended Appendix: Filter Teaching Notes
+
+### Filter 1 (`F1 EMA`)
+- Qualities: first-order exponential smoother (`alpha=0.85`), low compute, predictable blur profile.
+- Advantages: very stable, fast, easy to tune mentally, good default for noise suppression.
+- Drawbacks: can look soft on fine detail; directional pass structure can leave mild anisotropy in edge-heavy scenes.
+- Practical uses: baseline denoise pass, pre-smoothing before segmentation/thresholding, real-time preview pipelines.
+
+### Filter 2 (`F2 SOS`)
+- Qualities: cascaded first-order sections (`a=0.75`, `b=0.25`) for stronger smoothing than F1 with controlled response.
+- Advantages: cleaner suppression of high-frequency noise than F1, still robust and easy to deploy.
+- Drawbacks: more blur than F1 at default settings; can flatten texture if overused.
+- Practical uses: artifact cleanup for noisy sources, stable "reference look" for demos, temporal preconditioning in video workflows.
+
+### Filter 3 (`F3 Biquad`)
+- Qualities: second-order recursive form (biquad-scan contract) with richer response shape than first-order filters.
+- Advantages: can preserve macro-structure while reducing fine noise; useful when F1/F2 are too plain.
+- Drawbacks: more sensitive to boundary and block-scan implementation details; historically most likely to reveal block artifacts when contract math is wrong.
+- Practical uses: controlled stylization, structural smoothing where second-order response is desired, advanced experimentation.
+
+### Filter 4 (`F4 SOS`)
+- Qualities: cascaded biquad sections for stronger second-order shaping than F3.
+- Advantages: aggressive smoothing/stylization with limited kernel footprint and good runtime throughput.
+- Drawbacks: highest risk of over-smoothing and artifact visibility in challenging boundary conditions; needs careful QA on representative media.
+- Practical uses: heavy denoise/style looks, low-detail background cleanup, creative/post-processing variants.
+
+### Filter 5 (`F5 FB First`)
+- Qualities: forward-backward first-order pass (`zero-phase-like` behavior) reducing directional lag.
+- Advantages: better symmetry than one-way filters; often cleaner on edges where phase lag is noticeable.
+- Drawbacks: double pass cost; can still soften detail.
+- Practical uses: edge-aware smoothing where directional phase bias is undesirable, pre-processing for downstream measurement tasks.
+
+### Filter 6 (`F6 Deriche-ish`)
+- Qualities: recursive Deriche-inspired formulation with efficient large-scale smoothing behavior.
+- Advantages: strong smoothing with favorable compute characteristics versus large spatial kernels.
+- Drawbacks: parameter intuition is less obvious than F1/F2; not ideal as a first "safe default" for new users.
+- Practical uses: large-radius-like smoothing intent at low cost, pipelines that need high throughput on big frames.
+
+### Filter 7 (`F7 Sharper EMA`)
+- Qualities: contract-compatible first-order EMA variant intended for a crisper profile family.
+- Advantages: simple drop-in option when teams want a separate API slot for EMA-family tuning/experiments.
+- Drawbacks: current stable contract coefficients align with F1; expected output is effectively the same today.
+- Practical uses: compatibility placeholder for product tiers/presets, future-proofing around stable `1..8` API IDs.
+
+### Filter 8 (`F8 State`)
+- Qualities: state-space slot in the stable API, currently mapped to the same shipped biquad-scan contract behavior as F3.
+- Advantages: preserves contract space for a distinct state-space evolution without breaking public IDs.
+- Drawbacks: current output equivalence with F3 can confuse users expecting a visibly distinct look.
+- Practical uses: compatibility and migration planning, controlled experimentation behind a stable public identifier.
+
+### Selection Heuristic (Practical)
+- Start with F2 for default production smoothing.
+- Use F1 when you need maximum simplicity and speed.
+- Use F5 when phase symmetry matters.
+- Use F6 for strong smoothing at large image sizes.
+- Use F3/F4/F8 only with explicit visual QA on your target media.

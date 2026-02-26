@@ -125,6 +125,7 @@
 42. Colab notebook can export selected demo outputs as repository-ready assets (`readme_*.png` and `readme_*.mp4`) under `docs/notebooks/exports/`.
 43. Colab notebook can auto-run the core benchmark harness and generate a benchmark claims packet markdown artifact from notebook-produced CSV results.
 44. Checkerboard lab now includes explicit artifact-lite parameter regimes (e.g., dimensions `<=224`) so users can observe both no-checkerboard and checkerboard-prone behaviors.
+45. Checkerboard lab now exposes `checker_amp` control (`0.0` disables synthetic checker texture) and ships a default non-checkerboard preset.
 
 ## [1.0.0] - 2026-02-24
 ### Added

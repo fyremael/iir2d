@@ -119,6 +119,7 @@
 36. Colab notebook defaults now use checkerboard-safe showcase settings, with a dedicated interactive checkerboard lab for `F3/F4/F8` parameter exploration.
 37. Colab notebook now auto-bootstraps CUDA GPU execution for JAX + `iir2d_jax` when a GPU runtime is available, and raises explicit errors if GPU is detected but not used.
 38. Colab notebook demo sections now run GPU-first by default (JAX + `iir2d_jax`), with CPU paths retained only for explicit reference/parity checks.
+39. Colab notebook now removes JAX from the demo runtime path and executes the native CUDA core (`iir2d_forward_cuda`) directly for primary sections; CPU remains reference-only.
 
 ## [1.0.0] - 2026-02-24
 ### Added

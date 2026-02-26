@@ -117,6 +117,7 @@
 34. `scripts/build_and_smoke_macos.sh` now supports `IIR2D_SKIP_RUNTIME_SMOKE=1` for cross-arch artifact builds.
 35. `README.md` now includes CI/release/license/Colab badges and links to the new Colab notebook.
 36. Colab notebook defaults now use checkerboard-safe showcase settings, with a dedicated interactive checkerboard lab for `F3/F4/F8` parameter exploration.
+37. Colab notebook now auto-bootstraps CUDA GPU execution for JAX + `iir2d_jax` when a GPU runtime is available, and raises explicit errors if GPU is detected but not used.
 
 ## [1.0.0] - 2026-02-24
 ### Added

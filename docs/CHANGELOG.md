@@ -118,6 +118,7 @@
 35. `README.md` now includes CI/release/license/Colab badges and links to the new Colab notebook.
 36. Colab notebook defaults now use checkerboard-safe showcase settings, with a dedicated interactive checkerboard lab for `F3/F4/F8` parameter exploration.
 37. Colab notebook now auto-bootstraps CUDA GPU execution for JAX + `iir2d_jax` when a GPU runtime is available, and raises explicit errors if GPU is detected but not used.
+38. Colab notebook demo sections now run GPU-first by default (JAX + `iir2d_jax`), with CPU paths retained only for explicit reference/parity checks.
 
 ## [1.0.0] - 2026-02-24
 ### Added

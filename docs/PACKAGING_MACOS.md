@@ -16,6 +16,8 @@ Notes:
 Build + package locally:
 ```bash
 cd iir2d_op
+# optional: set target arch to x86_64 or arm64
+# export IIR2D_MACOS_ARCH=x86_64
 bash scripts/build_and_smoke_macos.sh
 mkdir -p dist/macos
 cp -f build_macos/libiir2d_jax.dylib dist/macos/

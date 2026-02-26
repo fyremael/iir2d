@@ -111,6 +111,7 @@
    4. macOS arm64 bundle (`iir2d-macos-arm64-<tag>.tar.gz`, CPU stub)
 31. Tag-driven GitHub Release publishing now attaches wheel, Linux/Windows/macOS binary bundles, and video report-pack artifacts.
 32. Native library discovery now includes `.dylib` candidates in `python/iir2d_jax/__init__.py`, `scripts/core_harness.py`, and `scripts/smoke_core_status.py`.
+33. macOS x86_64 bundle is now cross-compiled on `macos-14` runners (`IIR2D_MACOS_ARCH=x86_64`) to avoid retired `macos-13` hosted images.
 
 ## [1.0.0] - 2026-02-24
 ### Added

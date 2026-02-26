@@ -405,26 +405,27 @@ struct Transform4D {
 struct Transform4OpD {
     __device__ __forceinline__ Transform4D operator()(const Transform4D& left, const Transform4D& right) const {
         Transform4D o;
-        o.a00 = left.a00*right.a00 + left.a01*right.a10 + left.a02*right.a20 + left.a03*right.a30;
-        o.a01 = left.a00*right.a01 + left.a01*right.a11 + left.a02*right.a21 + left.a03*right.a31;
-        o.a02 = left.a00*right.a02 + left.a01*right.a12 + left.a02*right.a22 + left.a03*right.a32;
-        o.a03 = left.a00*right.a03 + left.a01*right.a13 + left.a02*right.a23 + left.a03*right.a33;
-        o.a10 = left.a10*right.a00 + left.a11*right.a10 + left.a12*right.a20 + left.a13*right.a30;
-        o.a11 = left.a10*right.a01 + left.a11*right.a11 + left.a12*right.a21 + left.a13*right.a31;
-        o.a12 = left.a10*right.a02 + left.a11*right.a12 + left.a12*right.a22 + left.a13*right.a32;
-        o.a13 = left.a10*right.a03 + left.a11*right.a13 + left.a12*right.a23 + left.a13*right.a33;
-        o.a20 = left.a20*right.a00 + left.a21*right.a10 + left.a22*right.a20 + left.a23*right.a30;
-        o.a21 = left.a20*right.a01 + left.a21*right.a11 + left.a22*right.a21 + left.a23*right.a31;
-        o.a22 = left.a20*right.a02 + left.a21*right.a12 + left.a22*right.a22 + left.a23*right.a32;
-        o.a23 = left.a20*right.a03 + left.a21*right.a13 + left.a22*right.a23 + left.a23*right.a33;
-        o.a30 = left.a30*right.a00 + left.a31*right.a10 + left.a32*right.a20 + left.a33*right.a30;
-        o.a31 = left.a30*right.a01 + left.a31*right.a11 + left.a32*right.a21 + left.a33*right.a31;
-        o.a32 = left.a30*right.a02 + left.a31*right.a12 + left.a32*right.a22 + left.a33*right.a32;
-        o.a33 = left.a30*right.a03 + left.a31*right.a13 + left.a32*right.a23 + left.a33*right.a33;
-        o.b0 = left.a00*right.b0 + left.a01*right.b1 + left.a02*right.b2 + left.a03*right.b3 + left.b0;
-        o.b1 = left.a10*right.b0 + left.a11*right.b1 + left.a12*right.b2 + left.a13*right.b3 + left.b1;
-        o.b2 = left.a20*right.b0 + left.a21*right.b1 + left.a22*right.b2 + left.a23*right.b3 + left.b2;
-        o.b3 = left.a30*right.b0 + left.a31*right.b1 + left.a32*right.b2 + left.a33*right.b3 + left.b3;
+        // Prefix scan composes left->right; return (right ∘ left).
+        o.a00 = right.a00*left.a00 + right.a01*left.a10 + right.a02*left.a20 + right.a03*left.a30;
+        o.a01 = right.a00*left.a01 + right.a01*left.a11 + right.a02*left.a21 + right.a03*left.a31;
+        o.a02 = right.a00*left.a02 + right.a01*left.a12 + right.a02*left.a22 + right.a03*left.a32;
+        o.a03 = right.a00*left.a03 + right.a01*left.a13 + right.a02*left.a23 + right.a03*left.a33;
+        o.a10 = right.a10*left.a00 + right.a11*left.a10 + right.a12*left.a20 + right.a13*left.a30;
+        o.a11 = right.a10*left.a01 + right.a11*left.a11 + right.a12*left.a21 + right.a13*left.a31;
+        o.a12 = right.a10*left.a02 + right.a11*left.a12 + right.a12*left.a22 + right.a13*left.a32;
+        o.a13 = right.a10*left.a03 + right.a11*left.a13 + right.a12*left.a23 + right.a13*left.a33;
+        o.a20 = right.a20*left.a00 + right.a21*left.a10 + right.a22*left.a20 + right.a23*left.a30;
+        o.a21 = right.a20*left.a01 + right.a21*left.a11 + right.a22*left.a21 + right.a23*left.a31;
+        o.a22 = right.a20*left.a02 + right.a21*left.a12 + right.a22*left.a22 + right.a23*left.a32;
+        o.a23 = right.a20*left.a03 + right.a21*left.a13 + right.a22*left.a23 + right.a23*left.a33;
+        o.a30 = right.a30*left.a00 + right.a31*left.a10 + right.a32*left.a20 + right.a33*left.a30;
+        o.a31 = right.a30*left.a01 + right.a31*left.a11 + right.a32*left.a21 + right.a33*left.a31;
+        o.a32 = right.a30*left.a02 + right.a31*left.a12 + right.a32*left.a22 + right.a33*left.a32;
+        o.a33 = right.a30*left.a03 + right.a31*left.a13 + right.a32*left.a23 + right.a33*left.a33;
+        o.b0 = right.a00*left.b0 + right.a01*left.b1 + right.a02*left.b2 + right.a03*left.b3 + right.b0;
+        o.b1 = right.a10*left.b0 + right.a11*left.b1 + right.a12*left.b2 + right.a13*left.b3 + right.b1;
+        o.b2 = right.a20*left.b0 + right.a21*left.b1 + right.a22*left.b2 + right.a23*left.b3 + right.b2;
+        o.b3 = right.a30*left.b0 + right.a31*left.b1 + right.a32*left.b2 + right.a33*left.b3 + right.b3;
         return o;
     }
 };
@@ -432,26 +433,27 @@ struct Transform4OpD {
 struct Transform4Op {
     __device__ __forceinline__ Transform4 operator()(const Transform4& left, const Transform4& right) const {
         Transform4 o;
-        o.a00 = left.a00*right.a00 + left.a01*right.a10 + left.a02*right.a20 + left.a03*right.a30;
-        o.a01 = left.a00*right.a01 + left.a01*right.a11 + left.a02*right.a21 + left.a03*right.a31;
-        o.a02 = left.a00*right.a02 + left.a01*right.a12 + left.a02*right.a22 + left.a03*right.a32;
-        o.a03 = left.a00*right.a03 + left.a01*right.a13 + left.a02*right.a23 + left.a03*right.a33;
-        o.a10 = left.a10*right.a00 + left.a11*right.a10 + left.a12*right.a20 + left.a13*right.a30;
-        o.a11 = left.a10*right.a01 + left.a11*right.a11 + left.a12*right.a21 + left.a13*right.a31;
-        o.a12 = left.a10*right.a02 + left.a11*right.a12 + left.a12*right.a22 + left.a13*right.a32;
-        o.a13 = left.a10*right.a03 + left.a11*right.a13 + left.a12*right.a23 + left.a13*right.a33;
-        o.a20 = left.a20*right.a00 + left.a21*right.a10 + left.a22*right.a20 + left.a23*right.a30;
-        o.a21 = left.a20*right.a01 + left.a21*right.a11 + left.a22*right.a21 + left.a23*right.a31;
-        o.a22 = left.a20*right.a02 + left.a21*right.a12 + left.a22*right.a22 + left.a23*right.a32;
-        o.a23 = left.a20*right.a03 + left.a21*right.a13 + left.a22*right.a23 + left.a23*right.a33;
-        o.a30 = left.a30*right.a00 + left.a31*right.a10 + left.a32*right.a20 + left.a33*right.a30;
-        o.a31 = left.a30*right.a01 + left.a31*right.a11 + left.a32*right.a21 + left.a33*right.a31;
-        o.a32 = left.a30*right.a02 + left.a31*right.a12 + left.a32*right.a22 + left.a33*right.a32;
-        o.a33 = left.a30*right.a03 + left.a31*right.a13 + left.a32*right.a23 + left.a33*right.a33;
-        o.b0 = left.a00*right.b0 + left.a01*right.b1 + left.a02*right.b2 + left.a03*right.b3 + left.b0;
-        o.b1 = left.a10*right.b0 + left.a11*right.b1 + left.a12*right.b2 + left.a13*right.b3 + left.b1;
-        o.b2 = left.a20*right.b0 + left.a21*right.b1 + left.a22*right.b2 + left.a23*right.b3 + left.b2;
-        o.b3 = left.a30*right.b0 + left.a31*right.b1 + left.a32*right.b2 + left.a33*right.b3 + left.b3;
+        // Prefix scan composes left->right; return (right ∘ left).
+        o.a00 = right.a00*left.a00 + right.a01*left.a10 + right.a02*left.a20 + right.a03*left.a30;
+        o.a01 = right.a00*left.a01 + right.a01*left.a11 + right.a02*left.a21 + right.a03*left.a31;
+        o.a02 = right.a00*left.a02 + right.a01*left.a12 + right.a02*left.a22 + right.a03*left.a32;
+        o.a03 = right.a00*left.a03 + right.a01*left.a13 + right.a02*left.a23 + right.a03*left.a33;
+        o.a10 = right.a10*left.a00 + right.a11*left.a10 + right.a12*left.a20 + right.a13*left.a30;
+        o.a11 = right.a10*left.a01 + right.a11*left.a11 + right.a12*left.a21 + right.a13*left.a31;
+        o.a12 = right.a10*left.a02 + right.a11*left.a12 + right.a12*left.a22 + right.a13*left.a32;
+        o.a13 = right.a10*left.a03 + right.a11*left.a13 + right.a12*left.a23 + right.a13*left.a33;
+        o.a20 = right.a20*left.a00 + right.a21*left.a10 + right.a22*left.a20 + right.a23*left.a30;
+        o.a21 = right.a20*left.a01 + right.a21*left.a11 + right.a22*left.a21 + right.a23*left.a31;
+        o.a22 = right.a20*left.a02 + right.a21*left.a12 + right.a22*left.a22 + right.a23*left.a32;
+        o.a23 = right.a20*left.a03 + right.a21*left.a13 + right.a22*left.a23 + right.a23*left.a33;
+        o.a30 = right.a30*left.a00 + right.a31*left.a10 + right.a32*left.a20 + right.a33*left.a30;
+        o.a31 = right.a30*left.a01 + right.a31*left.a11 + right.a32*left.a21 + right.a33*left.a31;
+        o.a32 = right.a30*left.a02 + right.a31*left.a12 + right.a32*left.a22 + right.a33*left.a32;
+        o.a33 = right.a30*left.a03 + right.a31*left.a13 + right.a32*left.a23 + right.a33*left.a33;
+        o.b0 = right.a00*left.b0 + right.a01*left.b1 + right.a02*left.b2 + right.a03*left.b3 + right.b0;
+        o.b1 = right.a10*left.b0 + right.a11*left.b1 + right.a12*left.b2 + right.a13*left.b3 + right.b1;
+        o.b2 = right.a20*left.b0 + right.a21*left.b1 + right.a22*left.b2 + right.a23*left.b3 + right.b2;
+        o.b3 = right.a30*left.b0 + right.a31*left.b1 + right.a32*left.b2 + right.a33*left.b3 + right.b3;
         return o;
     }
 };

@@ -104,6 +104,37 @@ def test_internal_row_biquad_and_statespace_helpers_return_expected_shape() -> N
     assert np.isfinite(y_ss).all()
 
 
+def test_scan_contract_matches_scalar_biquad_across_block_boundaries() -> None:
+    rng = np.random.default_rng(19)
+    x = rng.random(521, dtype=np.float64).astype(np.float32)
+    y_scan = cpu_ref._row_biquad_scan_contract(  # noqa: SLF001
+        x,
+        np.float32(0.2),
+        np.float32(0.2),
+        np.float32(0.2),
+        np.float32(0.3),
+        np.float32(-0.1),
+        cpu_ref.BORDER_MAP["mirror"],
+        np.float32(0.0),
+        np.float32,
+        np.dtype(np.float32),
+        block_width=256,
+    )
+    y_ref = cpu_ref._row_biquad(  # noqa: SLF001
+        x,
+        np.float32(0.2),
+        np.float32(0.2),
+        np.float32(0.2),
+        np.float32(0.3),
+        np.float32(-0.1),
+        cpu_ref.BORDER_MAP["mirror"],
+        np.float32(0.0),
+        np.float32,
+        np.dtype(np.float32),
+    )
+    np.testing.assert_allclose(y_scan, y_ref, rtol=1e-6, atol=1e-6)
+
+
 def test_apply_rows_invalid_filter_branch_raises() -> None:
     with pytest.raises(ValueError):
         cpu_ref._apply_rows(  # noqa: SLF001

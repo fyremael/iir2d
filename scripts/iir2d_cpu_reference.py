@@ -178,8 +178,8 @@ def _row_biquad_scan_contract(
             if scan_A:
                 left_A = scan_A[-1]
                 left_b = scan_b[-1]
-                out_A = left_A @ A
-                out_b = left_A @ b + left_b
+                out_A = A @ left_A
+                out_b = A @ left_b + b
             else:
                 out_A = A
                 out_b = b

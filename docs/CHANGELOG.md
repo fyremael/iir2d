@@ -121,6 +121,9 @@
 38. Colab notebook demo sections now run GPU-first by default (JAX + `iir2d_jax`), with CPU paths retained only for explicit reference/parity checks.
 39. Colab notebook now removes JAX from the demo runtime path and executes the native CUDA core (`iir2d_forward_cuda`) directly for primary sections; CPU remains reference-only.
 40. Colab notebook now includes a dedicated CPU-vs-GPU timing section that reports per-filter latency and speedup comparisons.
+41. Colab notebook now includes a live frame scrubber with side-by-side original vs filtered video views and per-frame metrics (MAE/RMSE/PSNR + temporal jump).
+42. Colab notebook can export selected demo outputs as repository-ready assets (`readme_*.png` and `readme_*.mp4`) under `docs/notebooks/exports/`.
+43. Colab notebook can auto-run the core benchmark harness and generate a benchmark claims packet markdown artifact from notebook-produced CSV results.
 
 ## [1.0.0] - 2026-02-24
 ### Added

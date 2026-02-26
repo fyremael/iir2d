@@ -132,12 +132,12 @@ def test_find_cudart_windows_prefers_cuda_root(monkeypatch: pytest.MonkeyPatch) 
         dll_path.parent.mkdir(parents=True, exist_ok=True)
         dll_path.write_text("", encoding="utf-8")
 
-        real_path = Path
+        real_path_type = type(fake_root)
 
         def fake_path(value: str) -> Path:
             if value == r"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA":
                 return fake_root
-            return real_path(value)
+            return real_path_type(value)
 
         class FakeCDLL:
             pass

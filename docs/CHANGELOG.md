@@ -97,6 +97,7 @@
 24. `quality-gates.yml` now hardens `pytest-cov` installation and retries the coverage command once on transient failures.
 25. `PILOT_WAVE1_EXECUTION.md` now links and operationalizes the wave tracker + acceptance checklist artifacts.
 26. `requirements-dev.txt` now includes `numpy` to satisfy CI test-collection imports under `quality-gates`.
+27. `tests/test_core_harness.py` Windows-path simulation now uses OS-stable concrete path type to avoid Linux `WindowsPath` instantiation failures.
 
 ## [1.0.0] - 2026-02-24
 ### Added

@@ -76,6 +76,7 @@
 35. Colab explainer notebook with interactive demos and entertaining exemplars:
    1. `docs/notebooks/IIR2D_Explainer_Colab.ipynb`
 36. Extended filter teaching appendix with per-filter sections in `docs/USAGE_GUIDE.md`.
+37. Extended per-filter teaching appendix with visual pedagogy in `docs/notebooks/IIR2D_Explainer_Colab.ipynb`.
 
 ### Changed
 1. Documentation for benchmark execution and runner validation in `README.md` and `RUNNER_SETUP.md`.

@@ -73,6 +73,8 @@
 34. macOS CPU-stub release build path for x86_64 + arm64:
    1. `scripts/build_and_smoke_macos.sh`
    2. `csrc/iir2d_core_stub.cpp`
+35. Colab explainer notebook with interactive demos and entertaining exemplars:
+   1. `docs/notebooks/IIR2D_Explainer_Colab.ipynb`
 
 ### Changed
 1. Documentation for benchmark execution and runner validation in `README.md` and `RUNNER_SETUP.md`.
@@ -113,6 +115,7 @@
 32. Native library discovery now includes `.dylib` candidates in `python/iir2d_jax/__init__.py`, `scripts/core_harness.py`, and `scripts/smoke_core_status.py`.
 33. macOS x86_64 bundle is now cross-compiled on `macos-14` runners (`IIR2D_MACOS_ARCH=x86_64`) to avoid retired `macos-13` hosted images.
 34. `scripts/build_and_smoke_macos.sh` now supports `IIR2D_SKIP_RUNTIME_SMOKE=1` for cross-arch artifact builds.
+35. `README.md` now includes CI/release/license/Colab badges and links to the new Colab notebook.
 
 ## [1.0.0] - 2026-02-24
 ### Added

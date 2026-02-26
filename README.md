@@ -1,4 +1,10 @@
 # IIR2D Native Hooks (PyTorch + JAX)
+[![Quality Gates](https://github.com/fyremael/iir2d/actions/workflows/quality-gates.yml/badge.svg?branch=main)](https://github.com/fyremael/iir2d/actions/workflows/quality-gates.yml)
+[![CUDA Cross-Platform](https://github.com/fyremael/iir2d/actions/workflows/cuda-cross-platform.yml/badge.svg?branch=main)](https://github.com/fyremael/iir2d/actions/workflows/cuda-cross-platform.yml)
+[![Release Artifacts](https://github.com/fyremael/iir2d/actions/workflows/release-artifacts.yml/badge.svg?branch=main)](https://github.com/fyremael/iir2d/actions/workflows/release-artifacts.yml)
+[![Latest Release](https://img.shields.io/github/v/release/fyremael/iir2d?display_name=tag&sort=semver)](https://github.com/fyremael/iir2d/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fyremael/iir2d/blob/main/docs/notebooks/IIR2D_Explainer_Colab.ipynb)
 
 This folder provides native CUDA hooks for the IIR2D filters:
 - **PyTorch**: C++/CUDA extension (`iir2d_torch_ext`)
@@ -8,6 +14,7 @@ The CUDA core uses a simple, per-row recursive implementation (correctness-first
 
 Usage guide:
 1. `docs/USAGE_GUIDE.md` (annotated operational runbook with intuition pumps)
+2. `docs/notebooks/IIR2D_Explainer_Colab.ipynb` (interactive explainer + entertaining exemplars)
 
 Commercialization docs:
 1. `docs/PRODUCT_ONE_PAGER.md`

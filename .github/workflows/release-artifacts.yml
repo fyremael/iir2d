@@ -132,12 +132,82 @@ jobs:
           path: |
             dist/iir2d-windows-x86_64-*.zip
 
+  build-macos-x86_64-binary-pack:
+    if: ${{ startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' }}
+    runs-on: macos-13
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and smoke (macOS x86_64 CPU stub)
+        shell: bash
+        run: |
+          bash scripts/build_and_smoke_macos.sh
+
+      - name: Package macOS x86_64 binary bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG_NAME="${GITHUB_REF_NAME:-dev}"
+          mkdir -p dist/macos_x86_64
+          cp -f build_macos/libiir2d_jax.dylib dist/macos_x86_64/
+          cp -f csrc/iir2d_core.h dist/macos_x86_64/
+          cp -f LICENSE NOTICE dist/macos_x86_64/
+          (
+            cd dist/macos_x86_64
+            shasum -a 256 libiir2d_jax.dylib > SHA256SUMS.txt
+          )
+          tar -czf "dist/iir2d-macos-x86_64-${TAG_NAME}.tar.gz" -C dist/macos_x86_64 .
+
+      - name: Upload macOS x86_64 binary bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-macos-x86_64-binary
+          path: |
+            dist/iir2d-macos-x86_64-*.tar.gz
+
+  build-macos-arm64-binary-pack:
+    if: ${{ startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' }}
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and smoke (macOS arm64 CPU stub)
+        shell: bash
+        run: |
+          bash scripts/build_and_smoke_macos.sh
+
+      - name: Package macOS arm64 binary bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG_NAME="${GITHUB_REF_NAME:-dev}"
+          mkdir -p dist/macos_arm64
+          cp -f build_macos/libiir2d_jax.dylib dist/macos_arm64/
+          cp -f csrc/iir2d_core.h dist/macos_arm64/
+          cp -f LICENSE NOTICE dist/macos_arm64/
+          (
+            cd dist/macos_arm64
+            shasum -a 256 libiir2d_jax.dylib > SHA256SUMS.txt
+          )
+          tar -czf "dist/iir2d-macos-arm64-${TAG_NAME}.tar.gz" -C dist/macos_arm64 .
+
+      - name: Upload macOS arm64 binary bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-macos-arm64-binary
+          path: |
+            dist/iir2d-macos-arm64-*.tar.gz
+
   publish-github-release:
     if: ${{ startsWith(github.ref, 'refs/tags/') }}
     needs:
       - build-wheel-and-report-pack
       - build-linux-binary-pack
       - build-windows-binary-pack
+      - build-macos-x86_64-binary-pack
+      - build-macos-arm64-binary-pack
     runs-on: ubuntu-latest
     steps:
       - name: Download release-wheel
@@ -164,6 +234,18 @@ jobs:
           name: release-windows-binary
           path: release-assets/release-windows-binary
 
+      - name: Download release-macos-x86_64-binary
+        uses: actions/download-artifact@v4
+        with:
+          name: release-macos-x86_64-binary
+          path: release-assets/release-macos-x86_64-binary
+
+      - name: Download release-macos-arm64-binary
+        uses: actions/download-artifact@v4
+        with:
+          name: release-macos-arm64-binary
+          path: release-assets/release-macos-arm64-binary
+
       - name: Publish GitHub Release Assets
         uses: softprops/action-gh-release@v2
         with:
@@ -173,3 +255,5 @@ jobs:
             release-assets/release-video-report-pack/*
             release-assets/release-linux-binary/*
             release-assets/release-windows-binary/*
+            release-assets/release-macos-x86_64-binary/*
+            release-assets/release-macos-arm64-binary/*

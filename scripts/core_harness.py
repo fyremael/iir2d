@@ -129,11 +129,17 @@ def candidate_core_libraries(repo_root: Path) -> list[Path]:
             pkg / "iir2d_jax.dll",
             repo_root / "build_win_ninja" / "iir2d_jax.dll",
             repo_root / "build_win_vs2019" / "Release" / "iir2d_jax.dll",
+            pkg / "libiir2d_jax.dylib",
+            pkg / "iir2d_jax.dylib",
+            repo_root / "build_macos" / "libiir2d_jax.dylib",
             pkg / "libiir2d_jax.so",
             pkg / "iir2d_jax.so",
             repo_root / "build_wsl" / "libiir2d_jax.so",
         ]
     return [
+        pkg / "libiir2d_jax.dylib",
+        pkg / "iir2d_jax.dylib",
+        repo_root / "build_macos" / "libiir2d_jax.dylib",
         pkg / "libiir2d_jax.so",
         pkg / "iir2d_jax.so",
         repo_root / "build_wsl" / "libiir2d_jax.so",

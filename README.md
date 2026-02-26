@@ -21,8 +21,9 @@ Commercialization docs:
 9. `docs/PILOT_TO_PAID_PLAYBOOK.md`
 10. `docs/PACKAGING_LINUX.md`
 11. `docs/PACKAGING_WINDOWS.md`
-12. `docs/PILOT_WAVE1_EXECUTION.md`
-13. `visual_showcase/index.html`
+12. `docs/PACKAGING_MACOS.md`
+13. `docs/PILOT_WAVE1_EXECUTION.md`
+14. `visual_showcase/index.html`
 
 ## Build (Linux)
 
@@ -54,6 +55,12 @@ Use the platform scripts to keep Linux/WSL and Windows build paths healthy:
 ```bash
 cd iir2d_op
 bash scripts/build_and_smoke_wsl.sh
+```
+
+### macOS (CPU stub contract build)
+```bash
+cd iir2d_op
+bash scripts/build_and_smoke_macos.sh
 ```
 
 ### Windows (PowerShell)
@@ -117,7 +124,9 @@ python3 -m pytest tests \
       1. Python wheel (`IIR2D_SKIP_EXT=1`)
       2. Linux binary bundle (`libiir2d_jax.so` + header + checksums)
       3. Windows binary bundle (`iir2d_jax.dll` + header + checksums)
-      4. Standardized video report-pack artifact
+      4. macOS x86_64 binary bundle (`libiir2d_jax.dylib` CPU-stub + header + checksums)
+      5. macOS arm64 binary bundle (`libiir2d_jax.dylib` CPU-stub + header + checksums)
+      6. Standardized video report-pack artifact
    3. On tag pushes, workflow publishes these as GitHub Release assets.
 
 ## Core Benchmark Harness (Commercialization Baseline)

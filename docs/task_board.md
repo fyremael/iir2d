@@ -22,7 +22,7 @@ Status values: `in_progress`, `blocked`, `done`
 | ENG-010 | Compatibility matrix (CUDA/driver/GPU/OS) | Product Lead | done | Matrix published and versioned in `COMPATIBILITY_MATRIX.md` |
 | ENG-011 | Add lint and unit-coverage quality gates | Platform Engineer | done | `quality-gates.yml` enforces ruff + pytest coverage (`>=85%` on core harness modules) |
 | ENG-012 | Package `iir2d_video` and publish release artifacts | Platform Engineer | done | `setup.py` ships `iir2d_video` + `scripts` in wheel mode (`IIR2D_SKIP_EXT=1`), and `.github/workflows/release-artifacts.yml` uploads wheel + video report-pack artifacts |
-| ENG-013 | Multi-platform binary release publishing | Platform Engineer | done | `.github/workflows/release-artifacts.yml` now emits Linux (`.tar.gz`) + Windows (`.zip`) binary bundles and publishes release assets on tag pushes |
+| ENG-013 | Multi-platform binary release publishing | Platform Engineer | done | `.github/workflows/release-artifacts.yml` now emits Linux (`.tar.gz`), Windows (`.zip`), and macOS (`.tar.gz`, x86_64 + arm64 CPU-stub) bundles and publishes release assets on tag pushes |
 | SEC-001 | Add LICENSE + third-party NOTICES | Product Lead | done | `LICENSE` finalized as MIT and `NOTICE` updated with project license declaration + third-party notice posture |
 | SEC-002 | Dependency/license scan integrated in CI | Platform Engineer | done | Workflow `dependency-license-scan.yml` added; CI fails on pip-audit vulnerabilities or license policy violations |
 | SEC-003 | Define vulnerability response SLA/process | Product Lead | done | `SECURITY.md` policy merged with reporting path and response SLA |
@@ -57,7 +57,7 @@ Status values: `in_progress`, `blocked`, `done`
 | ENG-005 | Benchmark harness v1 | Platform Engineer | done | Core C API harness implemented; sample evidence captured on 2026-02-25 (`/tmp/iir2d_core_bench_smoke.csv`) |
 | ENG-011 | Lint + unit coverage gate | Platform Engineer | done | Added `quality-gates.yml` with ruff lint and pytest coverage threshold on core harness modules |
 | ENG-012 | `iir2d_video` packaging + release artifacts | Platform Engineer | done | `setup.py` now includes `iir2d_video`/`scripts` in wheel mode and `release-artifacts.yml` emits wheel + report-pack artifacts |
-| ENG-013 | Multi-platform binary release publishing | Platform Engineer | done | Release workflow now packages Linux/Windows binaries and publishes GitHub Release assets on tags |
+| ENG-013 | Multi-platform binary release publishing | Platform Engineer | done | Release workflow now packages Linux/Windows binaries plus macOS x86_64/arm64 CPU-stub bundles and publishes GitHub Release assets on tags |
 | REL-001 | Release gate checklist | Product Lead | done | RC1 promoted using checklist record; CI links, self-hosted evidence, and delegated role sign-offs are recorded |
 | GTM-004 | Design-partner pilot launch (Wave 1) | GTM Lead | in_progress | Outreach templates + tracker/checklist + 3 pilot briefs prepared in `release_records/pilot_wave1/`; outbound + signed agreements pending |
 
@@ -75,7 +75,7 @@ Status values: `in_progress`, `blocked`, `done`
 | 2026-02-25 | CPU reference parity track is unresolved (`ENG-003`/`ENG-004`) | QA Engineer | Resolved: canonical contract + CPU reference + CI parity matrix validator landed | mitigated |
 | 2026-02-26 | Packaging path did not emit a consumable `iir2d_video` wheel/report pack for release handoff | Platform Engineer | Resolved: `setup.py` now supports pure wheel mode (`IIR2D_SKIP_EXT=1`) and `release-artifacts.yml` publishes wheel + report-pack artifacts | mitigated |
 | 2026-02-26 | Release gates regressed: `quality-gates` and Linux video smoke in `cuda-cross-platform` failed on `main` | Platform Engineer | Resolved: `numpy` added to `requirements-dev.txt`, Linux `Path` test bug fixed, video-smoke threshold gating relaxed; fresh consecutive green runs confirmed (`quality-gates` `#17/#16`, `cuda-cross-platform` `#19/#18`) | mitigated |
-| 2026-02-26 | Binary release path lacked multi-platform deliverables for customers | Platform Engineer | Resolved: release workflow now builds and publishes Linux + Windows binary bundles with checksums (`release-artifacts` runs `#4/#3`) | mitigated |
+| 2026-02-26 | Binary release path lacked multi-platform deliverables for customers | Platform Engineer | Resolved: release workflow now builds and publishes Linux + Windows CUDA bundles and macOS x86_64/arm64 CPU-stub bundles with checksums (`release-artifacts` run `#6`) | mitigated |
 | 2026-02-25 | Design-partner pilot launch depends on external counterparties (`GTM-004`) | GTM Lead | Wave 1 launch kit prepared (`PILOT_WAVE1_EXECUTION.md`, `release_records/pilot_wave1/`); execute outreach and close 3 signed pilot plans | in_progress |
 | 2026-02-26 | Ambiguous quality claims | GTM Lead | Mitigated by finalized benchmark protocol + claims packet workflow and sign-off gates | mitigated |
 

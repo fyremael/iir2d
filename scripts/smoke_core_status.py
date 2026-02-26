@@ -27,8 +27,11 @@ def candidate_libs(repo_root: Path) -> list[Path]:
             repo_root / "build" / "Release" / "iir2d_jax.dll",
         ]
     return [
+        pkg / "libiir2d_jax.dylib",
+        pkg / "iir2d_jax.dylib",
         pkg / "libiir2d_jax.so",
         pkg / "iir2d_jax.so",
+        repo_root / "build_macos" / "libiir2d_jax.dylib",
         repo_root / "build_wsl" / "libiir2d_jax.so",
     ]
 

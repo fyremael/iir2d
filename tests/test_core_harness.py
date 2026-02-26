@@ -55,7 +55,9 @@ def test_candidate_core_libraries_for_posix_and_nt(monkeypatch: pytest.MonkeyPat
     repo_root = Path("repo")
     monkeypatch.setattr(harness.os, "name", "posix")
     posix_paths = harness.candidate_core_libraries(repo_root)
-    assert posix_paths[0].name == "libiir2d_jax.so"
+    posix_names = {path.name for path in posix_paths}
+    assert "libiir2d_jax.so" in posix_names
+    assert "libiir2d_jax.dylib" in posix_names
 
     monkeypatch.setattr(harness.os, "name", "nt")
     nt_paths = harness.candidate_core_libraries(repo_root)

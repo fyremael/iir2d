@@ -27,6 +27,8 @@ def _load_lib():
         return _lib
     libname = "iir2d_jax"
     candidates = [
+        os.path.join(os.path.dirname(__file__), libname + ".dylib"),
+        os.path.join(os.path.dirname(__file__), "lib" + libname + ".dylib"),
         os.path.join(os.path.dirname(__file__), libname + ".so"),
         os.path.join(os.path.dirname(__file__), "lib" + libname + ".so"),
         os.path.join(os.path.dirname(__file__), libname + ".dll"),

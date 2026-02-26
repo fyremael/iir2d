@@ -26,6 +26,7 @@
    9. `PILOT_TO_PAID_PLAYBOOK.md`
    10. `PACKAGING_LINUX.md`
    11. `PACKAGING_WINDOWS.md`
+   12. `PACKAGING_MACOS.md`
 14. Security/dependency policy tooling:
    1. `.github/workflows/dependency-license-scan.yml`
    2. `scripts/check_license_policy.py`
@@ -69,6 +70,9 @@
 33. Pilot closeout ops artifacts:
    1. `release_records/pilot_wave1/OUTREACH_TRACKER.md`
    2. `release_records/pilot_wave1/PILOT_ACCEPTANCE_CHECKLIST.md`
+34. macOS CPU-stub release build path for x86_64 + arm64:
+   1. `scripts/build_and_smoke_macos.sh`
+   2. `csrc/iir2d_core_stub.cpp`
 
 ### Changed
 1. Documentation for benchmark execution and runner validation in `README.md` and `RUNNER_SETUP.md`.
@@ -103,7 +107,10 @@
 30. Multi-platform binary release packaging in `.github/workflows/release-artifacts.yml`:
    1. Linux bundle (`iir2d-linux-x86_64-<tag>.tar.gz`)
    2. Windows bundle (`iir2d-windows-x86_64-<tag>.zip`)
-31. Tag-driven GitHub Release publishing now attaches wheel, Linux/Windows binary bundles, and video report-pack artifacts.
+   3. macOS x86_64 bundle (`iir2d-macos-x86_64-<tag>.tar.gz`, CPU stub)
+   4. macOS arm64 bundle (`iir2d-macos-arm64-<tag>.tar.gz`, CPU stub)
+31. Tag-driven GitHub Release publishing now attaches wheel, Linux/Windows/macOS binary bundles, and video report-pack artifacts.
+32. Native library discovery now includes `.dylib` candidates in `python/iir2d_jax/__init__.py`, `scripts/core_harness.py`, and `scripts/smoke_core_status.py`.
 
 ## [1.0.0] - 2026-02-24
 ### Added

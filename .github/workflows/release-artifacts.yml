@@ -7,6 +7,16 @@ on:
       - "v*"
 
 jobs:
+  enforce-self-hosted-release-policy:
+    if: ${{ startsWith(github.ref, 'refs/tags/') && vars.IIR2D_USE_SELF_HOSTED != 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require self-hosted CUDA release mode
+        shell: bash
+        run: |
+          echo "IIR2D_USE_SELF_HOSTED must be true for tag-based multi-platform binary releases."
+          exit 1
+
   build-wheel-and-report-pack:
     runs-on: ubuntu-latest
     steps:
@@ -53,3 +63,110 @@ jobs:
             release_records/artifacts/video_reports/portrait_f1_bench.csv
             release_records/artifacts/video_reports/portrait_f1_quality.csv
             release_records/artifacts/video_reports/ci_release_report_pack.md
+
+  build-linux-binary-pack:
+    if: ${{ vars.IIR2D_USE_SELF_HOSTED == 'true' }}
+    runs-on: [self-hosted, linux, x64, gpu, cuda]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and smoke (Linux)
+        shell: bash
+        run: |
+          bash scripts/build_and_smoke_wsl.sh
+
+      - name: Package Linux binary bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG_NAME="${GITHUB_REF_NAME:-dev}"
+          mkdir -p dist/linux
+          cp -f build_wsl/libiir2d_jax.so dist/linux/
+          cp -f csrc/iir2d_core.h dist/linux/
+          cp -f LICENSE NOTICE dist/linux/
+          (
+            cd dist/linux
+            sha256sum libiir2d_jax.so > SHA256SUMS.txt
+          )
+          tar -czf "dist/iir2d-linux-x86_64-${TAG_NAME}.tar.gz" -C dist/linux .
+
+      - name: Upload Linux binary bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-linux-binary
+          path: |
+            dist/iir2d-linux-x86_64-*.tar.gz
+
+  build-windows-binary-pack:
+    if: ${{ vars.IIR2D_USE_SELF_HOSTED == 'true' }}
+    runs-on: [self-hosted, windows, x64, gpu, cuda]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and smoke (Windows, status-only)
+        shell: pwsh
+        run: |
+          powershell -ExecutionPolicy Bypass -File .\scripts\build_and_smoke_windows.ps1 -SkipGpuSmoke
+
+      - name: Package Windows binary bundle
+        shell: pwsh
+        run: |
+          $tag = if ($env:GITHUB_REF_NAME) { $env:GITHUB_REF_NAME } else { "dev" }
+          New-Item -ItemType Directory -Force -Path dist\windows | Out-Null
+          Copy-Item -Force python\iir2d_jax\iir2d_jax.dll dist\windows\
+          Copy-Item -Force csrc\iir2d_core.h dist\windows\
+          Copy-Item -Force LICENSE, NOTICE dist\windows\
+          $hash = Get-FileHash dist\windows\iir2d_jax.dll -Algorithm SHA256
+          "$($hash.Hash.ToLower())  iir2d_jax.dll" | Set-Content -Path dist\windows\SHA256SUMS.txt -Encoding utf8
+          Compress-Archive -Path dist\windows\* -DestinationPath ("dist\\iir2d-windows-x86_64-{0}.zip" -f $tag) -Force
+
+      - name: Upload Windows binary bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-windows-binary
+          path: |
+            dist/iir2d-windows-x86_64-*.zip
+
+  publish-github-release:
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    needs:
+      - build-wheel-and-report-pack
+      - build-linux-binary-pack
+      - build-windows-binary-pack
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release-wheel
+        uses: actions/download-artifact@v4
+        with:
+          name: release-wheel
+          path: release-assets/release-wheel
+
+      - name: Download release-video-report-pack
+        uses: actions/download-artifact@v4
+        with:
+          name: release-video-report-pack
+          path: release-assets/release-video-report-pack
+
+      - name: Download release-linux-binary
+        uses: actions/download-artifact@v4
+        with:
+          name: release-linux-binary
+          path: release-assets/release-linux-binary
+
+      - name: Download release-windows-binary
+        uses: actions/download-artifact@v4
+        with:
+          name: release-windows-binary
+          path: release-assets/release-windows-binary
+
+      - name: Publish GitHub Release Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            release-assets/release-wheel/*.whl
+            release-assets/release-video-report-pack/*
+            release-assets/release-linux-binary/*
+            release-assets/release-windows-binary/*

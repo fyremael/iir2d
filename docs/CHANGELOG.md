@@ -100,6 +100,10 @@
 27. `tests/test_core_harness.py` Windows-path simulation now uses OS-stable concrete path type to avoid Linux `WindowsPath` instantiation failures.
 28. RC prep CI evidence now shows fresh consecutive green runs for `quality-gates` (`#17/#16`) and `cuda-cross-platform` (`#19/#18`).
 29. `setup.py` now declares `numpy` as a runtime dependency so `iir2d_video` imports succeed from wheel installs in release artifact validation.
+30. Multi-platform binary release packaging in `.github/workflows/release-artifacts.yml`:
+   1. Linux bundle (`iir2d-linux-x86_64-<tag>.tar.gz`)
+   2. Windows bundle (`iir2d-windows-x86_64-<tag>.zip`)
+31. Tag-driven GitHub Release publishing now attaches wheel, Linux/Windows binary bundles, and video report-pack artifacts.
 
 ## [1.0.0] - 2026-02-24
 ### Added

@@ -113,7 +113,12 @@ python3 -m pytest tests \
 ```
 7. Release artifact workflow:
    1. `.github/workflows/release-artifacts.yml`
-   2. On `workflow_dispatch` or `v*` tags, builds a wheel (`IIR2D_SKIP_EXT=1`) and uploads a standardized video report-pack artifact.
+   2. On `workflow_dispatch` or `v*` tags, builds:
+      1. Python wheel (`IIR2D_SKIP_EXT=1`)
+      2. Linux binary bundle (`libiir2d_jax.so` + header + checksums)
+      3. Windows binary bundle (`iir2d_jax.dll` + header + checksums)
+      4. Standardized video report-pack artifact
+   3. On tag pushes, workflow publishes these as GitHub Release assets.
 
 ## Core Benchmark Harness (Commercialization Baseline)
 Use the C API benchmark harness to produce reproducible p50/p95 latency and throughput, with environment metadata attached to every row:

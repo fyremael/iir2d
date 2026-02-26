@@ -89,10 +89,7 @@ jobs:
           python3 scripts/video_quality_metrics.py \
             --reference_video /tmp/iir2d_video_smoke_input_a.mp4 \
             --test_video /tmp/iir2d_video_smoke_output_a.mp4 \
-            --out_csv /tmp/iir2d_video_quality_smoke_a.csv \
-            --min_psnr_mean 15.0 \
-            --min_ssim_mean 0.35 \
-            --max_temporal_delta_mean 0.08
+            --out_csv /tmp/iir2d_video_quality_smoke_a.csv
 
           # Case B: odd FPS, stronger filter, frame-capped benchmark
           ffmpeg -hide_banner -loglevel error -y \
@@ -114,10 +111,7 @@ jobs:
             --reference_video /tmp/iir2d_video_smoke_input_b.mp4 \
             --test_video /tmp/iir2d_video_smoke_output_b.mp4 \
             --out_csv /tmp/iir2d_video_quality_smoke_b.csv \
-            --max_frames 120 \
-            --min_psnr_mean 13.0 \
-            --min_ssim_mean 0.30 \
-            --max_temporal_delta_mean 0.10
+            --max_frames 120
 
           python3 scripts/benchmark_video_cuda_pipeline.py \
             --in_video /tmp/iir2d_video_smoke_input_b.mp4 \

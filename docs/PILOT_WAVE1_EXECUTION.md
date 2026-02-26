@@ -19,6 +19,8 @@ Secure 3 signed design-partner pilot agreements by 2026-03-12 using the existing
 5. Claims packet generator: `scripts/build_benchmark_claims_packet.py`
 6. Pilot structure template: `DESIGN_PARTNER_PILOT_TEMPLATE.md`
 7. Conversion path: `PILOT_TO_PAID_PLAYBOOK.md`
+8. Outreach tracker: `release_records/pilot_wave1/OUTREACH_TRACKER.md`
+9. Per-target readiness checklist: `release_records/pilot_wave1/PILOT_ACCEPTANCE_CHECKLIST.md`
 
 ## Outreach Cadence (per target)
 1. Day 0: Intro email with one-pager + 20-minute technical discovery ask.
@@ -49,3 +51,5 @@ Secure 3 signed design-partner pilot agreements by 2026-03-12 using the existing
 2. Produce one benchmark claims packet tailored to each target workload.
 3. Capture every interaction and next step directly in each pilot brief.
 4. Require a dated go/no-go checkpoint for each target by week 3.
+5. Update `OUTREACH_TRACKER.md` on Monday/Wednesday/Friday cadence.
+6. Complete `PILOT_ACCEPTANCE_CHECKLIST.md` before each proposal handoff.

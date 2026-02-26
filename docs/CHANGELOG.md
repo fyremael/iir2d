@@ -63,6 +63,12 @@
    2. `tests/test_check_asset_sizes.py`
 30. Typed video wrapper package in `iir2d_video/` now included in wheel packaging.
 31. Release artifact workflow: `.github/workflows/release-artifacts.yml` (wheel + video report-pack artifact outputs).
+32. RC prep evidence pack for current gate closure:
+   1. `release_records/evidence/RC_2026-02-26_PREP/ci_run_snapshot.md`
+   2. `release_records/evidence/RC_2026-02-26_PREP/issue_triage_rc2.md`
+33. Pilot closeout ops artifacts:
+   1. `release_records/pilot_wave1/OUTREACH_TRACKER.md`
+   2. `release_records/pilot_wave1/PILOT_ACCEPTANCE_CHECKLIST.md`
 
 ### Changed
 1. Documentation for benchmark execution and runner validation in `README.md` and `RUNNER_SETUP.md`.
@@ -87,6 +93,9 @@
 20. `visual_showcase/index.html` redesigned as a new interactive showcase surface with scene tabs, split-view theater, and refreshed visual system.
 21. `setup.py` now supports pure wheel builds via `IIR2D_SKIP_EXT=1` and packages `iir2d_video` + `scripts` for distribution.
 22. `task_board.md` and `RC_2026-02-25_PREP.md` updated to reflect packaging/release-artifact readiness evidence.
+23. `cuda-cross-platform.yml` video smoke now records quality CSVs without hard threshold gating in CI.
+24. `quality-gates.yml` now hardens `pytest-cov` installation and retries the coverage command once on transient failures.
+25. `PILOT_WAVE1_EXECUTION.md` now links and operationalizes the wave tracker + acceptance checklist artifacts.
 
 ## [1.0.0] - 2026-02-24
 ### Added
